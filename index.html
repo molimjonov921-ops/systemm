@@ -155,7 +155,7 @@
         .btn-debt { background: #ea580c; }
         .btn-expense { background: #dc2626; }
 
-        /* O‘ng tomon: Boshliq Monitoring Paneli */
+        /* O‘ng tomon: Boshliq Paneli */
         .admin-section {
             background: #111827;
             border-radius: 14px;
@@ -289,10 +289,10 @@
         .btn-confirm { background: #10b981; color: #ffffff; }
         .btn-cancel { background: #374151; color: #ffffff; }
 
-        /* Qidiruv avtotoldirish oynasi */
+        /* Qidiruv natijalarining oynasi */
         .suggestions-box {
             position: absolute;
-            top: 155px;
+            top: 150px;
             left: 24px;
             right: 24px;
             background: #1f2937;
@@ -466,7 +466,7 @@
     <!-- Firebase v10 Modular Script -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, query, orderBy, limit, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD4xBx6OWxa3ezscJyfkcFsO8SewI_NuOI",
@@ -483,8 +483,8 @@
 
         let currentInput = "";
         let existingCustomers = [];
-        
-        // Asosiy smena holati (Bazadan real-time boshqariladi)
+        let selectedCustomerData = null; // Tanlangan eski qarzdor
+
         let currentShift = {
             isOpen: false,
             staff: null,
@@ -510,10 +510,10 @@
         }
 
         // ==============================================================
-        // 1. REAL-TIME BAZA SINXRONIZATSIYASI (PEREZAGRUZKA VA BOSHQA TELEFONLAR UCHUN)
+        // 1. REAL-TIME BAZA SINXRONIZATSIYASI
         // ==============================================================
         
-        // A) Smena holatini doim eshitib turish (Planshet yoki boshqa telefonlar darhol bir xil ko'radi)
+        // Smenani eshitish (Perezagruzka va boshqa qurilmalar uchun)
         onSnapshot(doc(db, "kassa_smena", "active"), (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
@@ -541,7 +541,7 @@
             syncUI();
         });
 
-        // B) Jonli tranzaksiyalar lentasini bazadan eshitib turish (Oxirgi 50 ta savdo)
+        // Jonli tranzaksiyalar lentasi
         const qTx = query(collection(db, "kassa_savdo"), orderBy("date", "desc"), limit(50));
         onSnapshot(qTx, (snapshot) => {
             const list = document.getElementById('txList');
@@ -552,15 +552,24 @@
             });
         });
 
-        // C) Qarzlar daftaringizdan ismlarni o'qib olish (Faqat Read-Only)
+        // Qarzlar ro'yxatini doimiy o'qib olish (old-debtors & trusted-debtors)
         function loadExistingDebtors() {
             try {
                 onSnapshot(collection(db, "old-debtors"), (snap) => {
                     snap.forEach(d => {
                         const val = d.data();
                         const name = val.name || val.clientName || val.ism;
-                        if (name && !existingCustomers.some(c => c.name === name)) {
-                            existingCustomers.push({ name: name, total: val.total || val.debt || 0 });
+                        if (name) {
+                            const idx = existingCustomers.findIndex(c => c.id === d.id);
+                            const item = {
+                                id: d.id,
+                                coll: "old-debtors",
+                                name: name,
+                                total: Number(val.total || val.debt || 0),
+                                phone: val.phone || ""
+                            };
+                            if (idx >= 0) existingCustomers[idx] = item;
+                            else existingCustomers.push(item);
                         }
                     });
                 });
@@ -569,8 +578,17 @@
                     snap.forEach(d => {
                         const val = d.data();
                         const name = val.name || val.clientName || val.ism;
-                        if (name && !existingCustomers.some(c => c.name === name)) {
-                            existingCustomers.push({ name: name, total: val.total || val.debt || 0 });
+                        if (name) {
+                            const idx = existingCustomers.findIndex(c => c.id === d.id);
+                            const item = {
+                                id: d.id,
+                                coll: "trusted-debtors",
+                                name: name,
+                                total: Number(val.total || val.debt || 0),
+                                phone: val.phone || ""
+                            };
+                            if (idx >= 0) existingCustomers[idx] = item;
+                            else existingCustomers.push(item);
                         }
                     });
                 });
@@ -583,13 +601,15 @@
         const suggestBox = document.getElementById('customerSuggestions');
 
         searchInput.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase().trim();
-            if (!query) {
+            const queryText = e.target.value.toLowerCase().trim();
+            selectedCustomerData = null; // Qayta yozsa tanlov bekor bo'ladi
+            
+            if (!queryText) {
                 suggestBox.style.display = 'none';
                 return;
             }
 
-            const matched = existingCustomers.filter(c => c.name.toLowerCase().includes(query));
+            const matched = existingCustomers.filter(c => c.name.toLowerCase().includes(queryText));
             if (matched.length === 0) {
                 suggestBox.style.display = 'none';
                 return;
@@ -602,6 +622,7 @@
                 item.innerHTML = `<span>${c.name}</span><span style="color:#fb923c;">${Number(c.total).toLocaleString('uz-UZ')} so'm</span>`;
                 item.onclick = () => {
                     searchInput.value = c.name;
+                    selectedCustomerData = c;
                     suggestBox.style.display = 'none';
                 };
                 suggestBox.appendChild(item);
@@ -609,7 +630,7 @@
             suggestBox.style.display = 'block';
         });
 
-        // Raqamlar bilan ishlash
+        // Raqamlar bosilganda
         document.querySelectorAll('.key-btn[data-key]').forEach(btn => {
             btn.addEventListener('click', () => {
                 if (!currentShift.isOpen) {
@@ -633,9 +654,7 @@
             el.textContent = currentInput ? Number(currentInput).toLocaleString('uz-UZ') : "0";
         }
 
-        // ==============================================================
-        // 2. SMENANI OCHISH / YOPISH
-        // ==============================================================
+        // Smenani boshqarish
         const shiftActionBtn = document.getElementById('shiftActionBtn');
         shiftActionBtn.addEventListener('click', () => {
             if (!currentShift.isOpen) {
@@ -686,7 +705,6 @@
         document.getElementById('btnConfirmClose').addEventListener('click', async () => {
             const boxCash = currentShift.startCash + shiftTotals.cash - shiftTotals.expense;
             
-            // Tarix uchun arxivga qo'shish
             await addDoc(collection(db, "kassa_arxiv"), {
                 ...currentShift,
                 closedAt: new Date().toISOString(),
@@ -694,7 +712,6 @@
                 finalBoxCash: boxCash
             });
 
-            // Faol smenani yopish
             await setDoc(doc(db, "kassa_smena", "active"), {
                 isOpen: false,
                 staff: "Tanlanmagan",
@@ -707,12 +724,10 @@
             closeModals();
             currentInput = "";
             updateDisplay();
-            alert("Kun yopildi va hisobot arxivlandi!");
+            alert("Kun yopildi va arxivlandi!");
         });
 
-        // ==============================================================
-        // 3. TO'LOVLAR (NAQD, KARTA, NASIYA, CHIQIM)
-        // ==============================================================
+        // To'lovlar
         document.getElementById('btnPayCash').addEventListener('click', () => handleDirectPay('naqd'));
         document.getElementById('btnPayCard').addEventListener('click', () => handleDirectPay('karta'));
 
@@ -735,7 +750,7 @@
             updateDisplay();
         }
 
-        // Nasiya
+        // NASIYA BOSILGANDA
         document.getElementById('btnPayDebt').addEventListener('click', () => {
             const amount = Number(currentInput);
             if (!amount || amount <= 0) {
@@ -746,7 +761,8 @@
             document.getElementById('debtModal').classList.add('active');
         });
 
-        document.getElementById('btnConfirmDebt').addEventListener('click', () => {
+        // NASIYA SAQLANGANDA (QARZ NAZORATI SAYTIGA QO'SHILADI)
+        document.getElementById('btnConfirmDebt').addEventListener('click', async () => {
             const name = document.getElementById('debtCustomerName').value.trim();
             const note = document.getElementById('debtNote').value.trim();
             if (!name) {
@@ -755,18 +771,55 @@
             }
 
             const amount = Number(currentInput);
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'});
+            const dateStr = now.toISOString();
+
+            // 1. Kassa hisobotiga yozamiz
             saveTx({
                 type: 'nasiya',
                 amount: amount,
                 customer: name,
                 note: note,
                 staff: currentShift.staff,
-                time: new Date().toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'}),
-                date: new Date().toISOString()
+                time: timeStr,
+                date: dateStr
             });
+
+            // 2. QARZ NAZORATI SAYTIGA YUBORAMIZ
+            try {
+                if (selectedCustomerData) {
+                    // Mavjud odam bo'lsa: uning qarziga yangi summani qo'shamiz
+                    const targetRef = doc(db, selectedCustomerData.coll, selectedCustomerData.id);
+                    const newTotal = (selectedCustomerData.total || 0) + amount;
+                    
+                    await updateDoc(targetRef, {
+                        total: newTotal,
+                        debt: newTotal,
+                        lastNote: note || "Nasiya savdo",
+                        lastDate: dateStr,
+                        staff: currentShift.staff
+                    });
+                } else {
+                    // Yangi odam bo'lsa: old-debtors ga yangi qarzdor qilib qo'shamiz
+                    await addDoc(collection(db, "old-debtors"), {
+                        name: name,
+                        clientName: name,
+                        total: amount,
+                        debt: amount,
+                        phone: "",
+                        note: note || "Kassadan nasiya",
+                        createdAt: dateStr,
+                        staff: currentShift.staff
+                    });
+                }
+            } catch (err) {
+                console.error("Qarz bazasiga yozishda xato:", err);
+            }
 
             document.getElementById('debtCustomerName').value = "";
             document.getElementById('debtNote').value = "";
+            selectedCustomerData = null;
             suggestBox.style.display = 'none';
             closeModals();
             currentInput = "";
@@ -807,7 +860,7 @@
             updateDisplay();
         });
 
-        // Savdoni to'g'ridan-to'g'ri Firestore'ga yozish
+        // Savdoni saqlash
         async function saveTx(data) {
             let updatedTotals = { ...shiftTotals };
             if (data.type === 'naqd') updatedTotals.cash += data.amount;
@@ -817,10 +870,8 @@
 
             const boxNow = currentShift.startCash + updatedTotals.cash - updatedTotals.expense;
 
-            // Bazaga yangi tranzaksiya yozish
             await addDoc(collection(db, "kassa_savdo"), data);
 
-            // Bazadagi faol smenani yangilash (Bu orqali boshliqning telefoni ham bir zumda yangilanadi)
             await setDoc(doc(db, "kassa_smena", "active"), {
                 isOpen: true,
                 staff: currentShift.staff,
@@ -868,7 +919,6 @@
                 shiftActionBtn.className = "btn-shift btn-open-shift";
             }
 
-            // Statiskalarni yangilash
             document.getElementById('statTotalCash').textContent = formatSum(shiftTotals.cash);
             document.getElementById('statTotalCard').textContent = formatSum(shiftTotals.card);
             document.getElementById('statTotalDebt').textContent = formatSum(shiftTotals.debt);
