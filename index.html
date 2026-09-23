@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Magazin Kassa & Nazorat</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-weight: 800; /* Barcha yozuvlar qalin BOLD */
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: #0b0f19;
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Yuqori Panel */
+        header {
+            background-color: #111827;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #1f2937;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 16px;
+        }
+
+        .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ef4444;
+            box-shadow: 0 0 8px #ef4444;
+        }
+        .dot.active { 
+            background: #10b981; 
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        .btn-shift {
+            padding: 10px 22px;
+            border-radius: 10px;
+            cursor: pointer;
+            border: none;
+            font-size: 15px;
+            letter-spacing: 0.5px;
+        }
+        .btn-open-shift { background: #10b981; color: #ffffff; }
+        .btn-close-shift { background: #ef4444; color: #ffffff; }
+
+        /* Asosiy Ekran */
+        .main-container {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 16px;
+            padding: 16px;
+            flex: 1;
+        }
+
+        /* Chap tomon: Kassa & Kalkulyator */
+        .pos-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .display-screen {
+            background: #030712;
+            border: 2px solid #1f2937;
+            border-radius: 14px;
+            padding: 14px 20px;
+            text-align: right;
+        }
+
+        .display-label {
+            font-size: 13px;
+            color: #9ca3af;
+            letter-spacing: 1px;
+        }
+
+        .display-amount {
+            font-size: 46px;
+            color: #38bdf8;
+            min-height: 54px;
+            line-height: 1.2;
+        }
+
+        .keypad-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            flex: 1;
+        }
+
+        .key-btn {
+            background: #1f2937;
+            color: #ffffff;
+            border: 2px solid #374151;
+            border-radius: 12px;
+            font-size: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .key-btn:active {
+            transform: scale(0.96);
+            background: #374151;
+        }
+
+        .key-btn.action {
+            background: #374151;
+            color: #f87171;
+        }
+
+        .pay-buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .pay-btn {
+            border: none;
+            border-radius: 12px;
+            padding: 18px 8px;
+            font-size: 17px;
+            color: #ffffff;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+            text-align: center;
+        }
+
+        .pay-btn:active { transform: scale(0.95); }
+
+        .btn-cash { background: #16a34a; }
+        .btn-card { background: #2563eb; }
+        .btn-debt { background: #ea580c; }
+        .btn-expense { background: #dc2626; }
+
+        /* O‘ng tomon: Boshliq Monitoring Paneli */
+        .admin-section {
+            background: #111827;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            border: 2px solid #1f2937;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .stat-card {
+            background: #030712;
+            border-radius: 10px;
+            padding: 12px 14px;
+            border: 2px solid #1f2937;
+        }
+
+        .stat-card.full { grid-column: span 2; }
+
+        .stat-title {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 4px;
+        }
+
+        .stat-val {
+            font-size: 22px;
+        }
+
+        .val-cash { color: #4ade80; }
+        .val-card { color: #60a5fa; }
+        .val-debt { color: #fb923c; }
+        .val-expense { color: #f87171; }
+
+        /* Jonli Lenta */
+        .feed-container {
+            flex: 1;
+            background: #030712;
+            border-radius: 10px;
+            border: 2px solid #1f2937;
+            padding: 12px;
+            overflow-y: auto;
+            max-height: 280px;
+        }
+
+        .feed-title {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .feed-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 2px solid #111827;
+            font-size: 15px;
+        }
+
+        .feed-type {
+            font-size: 12px;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+
+        .badge-cash { background: #16a34a33; color: #4ade80; border: 1px solid #16a34a; }
+        .badge-card { background: #2563eb33; color: #60a5fa; border: 1px solid #2563eb; }
+        .badge-debt { background: #ea580c33; color: #fb923c; border: 1px solid #ea580c; }
+        .badge-expense { background: #dc262633; color: #f87171; border: 1px solid #dc2626; }
+
+        /* Modallar */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+        }
+
+        .modal.active { display: flex; }
+
+        .modal-card {
+            background: #111827;
+            border: 2px solid #374151;
+            border-radius: 16px;
+            padding: 24px;
+            width: 90%;
+            max-width: 440px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            position: relative;
+        }
+
+        .modal-card select, .modal-card input {
+            background: #030712;
+            border: 2px solid #374151;
+            color: #ffffff;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 8px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 14px;
+            border-radius: 10px;
+            font-size: 15px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-confirm { background: #10b981; color: #ffffff; }
+        .btn-cancel { background: #374151; color: #ffffff; }
+
+        /* Qidiruv avtotoldirish oynasi */
+        .suggestions-box {
+            position: absolute;
+            top: 155px;
+            left: 24px;
+            right: 24px;
+            background: #1f2937;
+            border: 2px solid #4b5563;
+            border-radius: 10px;
+            max-height: 180px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+
+        .suggestion-item {
+            padding: 12px 14px;
+            border-bottom: 1px solid #374151;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .suggestion-item:hover, .suggestion-item:active {
+            background: #374151;
+            color: #38bdf8;
+        }
+
+        @media (max-width: 900px) {
+            .main-container { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Yuqori Panel -->
+    <header>
+        <div class="status-badge">
+            <span class="dot" id="statusDot"></span>
+            <span id="shiftStatusText">KUN YOPIQ</span>
+            <span style="color: #4b5563;">|</span>
+            <span id="activeStaffText">HODIM: TANLANMAGAN</span>
+        </div>
+        <div>
+            <button class="btn-shift btn-open-shift" id="shiftActionBtn">KUNNI OCHISH</button>
+        </div>
+    </header>
+
+    <div class="main-container">
+        <!-- Chap: Kassa -->
+        <div class="pos-section">
+            <div class="display-screen">
+                <div class="display-label">SUMMA:</div>
+                <div class="display-amount" id="displayAmount">0</div>
+            </div>
+
+            <div class="keypad-grid">
+                <button class="key-btn" data-key="1">1</button>
+                <button class="key-btn" data-key="2">2</button>
+                <button class="key-btn" data-key="3">3</button>
+                <button class="key-btn" data-key="4">4</button>
+                <button class="key-btn" data-key="5">5</button>
+                <button class="key-btn" data-key="6">6</button>
+                <button class="key-btn" data-key="7">7</button>
+                <button class="key-btn" data-key="8">8</button>
+                <button class="key-btn" data-key="9">9</button>
+                <button class="key-btn action" id="clearBtn">C</button>
+                <button class="key-btn" data-key="0">0</button>
+                <button class="key-btn action" data-key="000">000</button>
+            </div>
+
+            <div class="pay-buttons-grid">
+                <button class="pay-btn btn-cash" id="btnPayCash">NAQD</button>
+                <button class="pay-btn btn-card" id="btnPayCard">KARTA</button>
+                <button class="pay-btn btn-debt" id="btnPayDebt">NASIYA</button>
+                <button class="pay-btn btn-expense" id="btnPayExpense">CHIQIM</button>
+            </div>
+        </div>
+
+        <!-- O‘ng: Boshliq Nazorat Paneli -->
+        <div class="admin-section">
+            <div class="stat-grid">
+                <div class="stat-card full" style="border-left: 5px solid #38bdf8;">
+                    <div class="stat-title">G'ALADONDAGI SOF NAQD PUL:</div>
+                    <div class="stat-val val-cash" id="statCashInBox">0 so'm</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-title">BUGUNGI NAQD:</div>
+                    <div class="stat-val val-cash" id="statTotalCash">0 so'm</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-title">BUGUNGI KARTA / CLICK:</div>
+                    <div class="stat-val val-card" id="statTotalCard">0 so'm</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-title">BUGUNGI NASIYA:</div>
+                    <div class="stat-val val-debt" id="statTotalDebt">0 so'm</div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-title">BUGUNGI CHIQIM:</div>
+                    <div class="stat-val val-expense" id="statTotalExpense">0 so'm</div>
+                </div>
+            </div>
+
+            <!-- Jonli Lenta -->
+            <div class="feed-container">
+                <div class="feed-title">
+                    <span>JONLI SAVDOLAR:</span>
+                    <span id="liveClock" style="color: #38bdf8;"></span>
+                </div>
+                <div id="txList"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modallar -->
+    <div class="modal" id="openShiftModal">
+        <div class="modal-card">
+            <h3 style="color: #10b981;">KUNNI OCHISH</h3>
+            <label style="font-size: 13px; color: #9ca3af;">Xodimni tanlang:</label>
+            <select id="selectStaff">
+                <option value="Muzaffar">Muzaffar</option>
+                <option value="Ulugbek">Ulug'bek</option>
+            </select>
+            <label style="font-size: 13px; color: #9ca3af;">Kassadagi boshlang'ich naqd pul (so'm):</label>
+            <input type="number" id="startCashInput" placeholder="Masalan: 200000" value="0">
+            <div class="modal-actions">
+                <button class="btn-cancel" id="btnCancelOpen">BEKOR QILISH</button>
+                <button class="btn-confirm" id="btnConfirmOpen">OCHISH</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="closeShiftModal">
+        <div class="modal-card">
+            <h3 style="color: #f87171;">KUNNI YOPISH (Z-HISOBOT)</h3>
+            <div id="closeShiftSummary" style="font-size: 15px; line-height: 1.8; color: #e5e7eb;"></div>
+            <div class="modal-actions">
+                <button class="btn-cancel" id="btnCancelClose">ORQAGA</button>
+                <button class="btn-confirm" style="background: #dc2626;" id="btnConfirmClose">YOPISH VA SAQLASH</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="debtModal">
+        <div class="modal-card">
+            <h3 style="color: #fb923c;">NASIYA QO'SHISH</h3>
+            <p id="debtAmountLabel" style="color: #38bdf8; font-size: 22px;"></p>
+            <input type="text" id="debtCustomerName" placeholder="Mijoz ismi (yozishni boshlang...)" autocomplete="off">
+            <div id="customerSuggestions" class="suggestions-box"></div>
+            <input type="text" id="debtNote" placeholder="Izoh (masalan: un, yog')">
+            <div class="modal-actions">
+                <button class="btn-cancel" id="btnCancelDebt">BEKOR QILISH</button>
+                <button class="btn-confirm" id="btnConfirmDebt">SAQLASH</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="expenseModal">
+        <div class="modal-card">
+            <h3 style="color: #f87171;">KASSADAN CHIQIM QILISH</h3>
+            <p id="expenseAmountLabel" style="color: #38bdf8; font-size: 22px;"></p>
+            <input type="text" id="expenseReason" placeholder="Qayerga ketdi? (Optom, non, xarajat)">
+            <div class="modal-actions">
+                <button class="btn-cancel" id="btnCancelExpense">BEKOR QILISH</button>
+                <button class="btn-confirm" style="background: #dc2626;" id="btnConfirmExpense">TASDIQLASH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase v10 Modular Script -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD4xBx6OWxa3ezscJyfkcFsO8SewI_NuOI",
+            authDomain: "qarz-nazorati-bc34a.firebaseapp.com",
+            projectId: "qarz-nazorati-bc34a",
+            storageBucket: "qarz-nazorati-bc34a.firebasestorage.app",
+            messagingSenderId: "528658056609",
+            appId: "1:528658056609:web:d3ad5a6fb7f05f644337e0",
+            measurementId: "G-E5GTDNCEQF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let currentInput = "";
+        let existingCustomers = [];
+        
+        // Asosiy smena holati (Bazadan real-time boshqariladi)
+        let currentShift = {
+            isOpen: false,
+            staff: null,
+            startTime: null,
+            startCash: 0
+        };
+
+        let shiftTotals = {
+            cash: 0,
+            card: 0,
+            debt: 0,
+            expense: 0
+        };
+
+        // Soat
+        setInterval(() => {
+            const now = new Date();
+            document.getElementById('liveClock').textContent = now.toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+        }, 1000);
+
+        function formatSum(val) {
+            return Number(val || 0).toLocaleString('uz-UZ') + " so'm";
+        }
+
+        // ==============================================================
+        // 1. REAL-TIME BAZA SINXRONIZATSIYASI (PEREZAGRUZKA VA BOSHQA TELEFONLAR UCHUN)
+        // ==============================================================
+        
+        // A) Smena holatini doim eshitib turish (Planshet yoki boshqa telefonlar darhol bir xil ko'radi)
+        onSnapshot(doc(db, "kassa_smena", "active"), (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                currentShift = {
+                    isOpen: data.isOpen || false,
+                    staff: data.staff || null,
+                    startTime: data.startTime || data.openedAt || null,
+                    startCash: Number(data.startCash || 0)
+                };
+
+                if (data.totals) {
+                    shiftTotals = {
+                        cash: Number(data.totals.cash || 0),
+                        card: Number(data.totals.card || 0),
+                        debt: Number(data.totals.debt || 0),
+                        expense: Number(data.totals.expense || 0)
+                    };
+                } else {
+                    shiftTotals = { cash: 0, card: 0, debt: 0, expense: 0 };
+                }
+            } else {
+                currentShift = { isOpen: false, staff: null, startTime: null, startCash: 0 };
+                shiftTotals = { cash: 0, card: 0, debt: 0, expense: 0 };
+            }
+            syncUI();
+        });
+
+        // B) Jonli tranzaksiyalar lentasini bazadan eshitib turish (Oxirgi 50 ta savdo)
+        const qTx = query(collection(db, "kassa_savdo"), orderBy("date", "desc"), limit(50));
+        onSnapshot(qTx, (snapshot) => {
+            const list = document.getElementById('txList');
+            list.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                renderFeedItem(data);
+            });
+        });
+
+        // C) Qarzlar daftaringizdan ismlarni o'qib olish (Faqat Read-Only)
+        function loadExistingDebtors() {
+            try {
+                onSnapshot(collection(db, "old-debtors"), (snap) => {
+                    snap.forEach(d => {
+                        const val = d.data();
+                        const name = val.name || val.clientName || val.ism;
+                        if (name && !existingCustomers.some(c => c.name === name)) {
+                            existingCustomers.push({ name: name, total: val.total || val.debt || 0 });
+                        }
+                    });
+                });
+
+                onSnapshot(collection(db, "trusted-debtors"), (snap) => {
+                    snap.forEach(d => {
+                        const val = d.data();
+                        const name = val.name || val.clientName || val.ism;
+                        if (name && !existingCustomers.some(c => c.name === name)) {
+                            existingCustomers.push({ name: name, total: val.total || val.debt || 0 });
+                        }
+                    });
+                });
+            } catch(e) {}
+        }
+        loadExistingDebtors();
+
+        // Autocomplete qidiruv
+        const searchInput = document.getElementById('debtCustomerName');
+        const suggestBox = document.getElementById('customerSuggestions');
+
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            if (!query) {
+                suggestBox.style.display = 'none';
+                return;
+            }
+
+            const matched = existingCustomers.filter(c => c.name.toLowerCase().includes(query));
+            if (matched.length === 0) {
+                suggestBox.style.display = 'none';
+                return;
+            }
+
+            suggestBox.innerHTML = '';
+            matched.forEach(c => {
+                const item = document.createElement('div');
+                item.className = 'suggestion-item';
+                item.innerHTML = `<span>${c.name}</span><span style="color:#fb923c;">${Number(c.total).toLocaleString('uz-UZ')} so'm</span>`;
+                item.onclick = () => {
+                    searchInput.value = c.name;
+                    suggestBox.style.display = 'none';
+                };
+                suggestBox.appendChild(item);
+            });
+            suggestBox.style.display = 'block';
+        });
+
+        // Raqamlar bilan ishlash
+        document.querySelectorAll('.key-btn[data-key]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!currentShift.isOpen) {
+                    alert("Avval 'KUNNI OCHISH' tugmasini bosing!");
+                    return;
+                }
+                const val = btn.getAttribute('data-key');
+                if (currentInput === "0" && val !== "000") currentInput = "";
+                currentInput += val;
+                updateDisplay();
+            });
+        });
+
+        document.getElementById('clearBtn').addEventListener('click', () => {
+            currentInput = "";
+            updateDisplay();
+        });
+
+        function updateDisplay() {
+            const el = document.getElementById('displayAmount');
+            el.textContent = currentInput ? Number(currentInput).toLocaleString('uz-UZ') : "0";
+        }
+
+        // ==============================================================
+        // 2. SMENANI OCHISH / YOPISH
+        // ==============================================================
+        const shiftActionBtn = document.getElementById('shiftActionBtn');
+        shiftActionBtn.addEventListener('click', () => {
+            if (!currentShift.isOpen) {
+                document.getElementById('openShiftModal').classList.add('active');
+            } else {
+                renderShiftSummary();
+                document.getElementById('closeShiftModal').classList.add('active');
+            }
+        });
+
+        document.getElementById('btnCancelOpen').addEventListener('click', closeModals);
+        document.getElementById('btnCancelClose').addEventListener('click', closeModals);
+        document.getElementById('btnCancelDebt').addEventListener('click', closeModals);
+        document.getElementById('btnCancelExpense').addEventListener('click', closeModals);
+
+        document.getElementById('btnConfirmOpen').addEventListener('click', async () => {
+            const staff = document.getElementById('selectStaff').value;
+            const startCash = Number(document.getElementById('startCashInput').value) || 0;
+
+            const newShiftData = {
+                isOpen: true,
+                staff: staff,
+                startTime: new Date().toISOString(),
+                startCash: startCash,
+                totals: { cash: 0, card: 0, debt: 0, expense: 0 },
+                cashInBox: startCash
+            };
+
+            await setDoc(doc(db, "kassa_smena", "active"), newShiftData);
+            closeModals();
+        });
+
+        function renderShiftSummary() {
+            const boxCash = currentShift.startCash + shiftTotals.cash - shiftTotals.expense;
+            document.getElementById('closeShiftSummary').innerHTML = `
+                <p><strong>XODIM:</strong> ${currentShift.staff}</p>
+                <p><strong>BOSHLANG'ICH PUL:</strong> ${formatSum(currentShift.startCash)}</p>
+                <hr style="border-color:#374151; margin:8px 0;">
+                <p style="color:#4ade80;">🟢 NAQD TUSHUM: +${formatSum(shiftTotals.cash)}</p>
+                <p style="color:#60a5fa;">🔵 KARTA / CLICK: ${formatSum(shiftTotals.card)}</p>
+                <p style="color:#fb923c;">🟠 NASIYA: ${formatSum(shiftTotals.debt)}</p>
+                <p style="color:#f87171;">🔴 CHIQIM: -${formatSum(shiftTotals.expense)}</p>
+                <hr style="border-color:#374151; margin:8px 0;">
+                <p style="font-size:18px; color:#38bdf8;"><strong>G'ALADONDA QOLISHI KERAK: ${formatSum(boxCash)}</strong></p>
+            `;
+        }
+
+        document.getElementById('btnConfirmClose').addEventListener('click', async () => {
+            const boxCash = currentShift.startCash + shiftTotals.cash - shiftTotals.expense;
+            
+            // Tarix uchun arxivga qo'shish
+            await addDoc(collection(db, "kassa_arxiv"), {
+                ...currentShift,
+                closedAt: new Date().toISOString(),
+                totals: shiftTotals,
+                finalBoxCash: boxCash
+            });
+
+            // Faol smenani yopish
+            await setDoc(doc(db, "kassa_smena", "active"), {
+                isOpen: false,
+                staff: "Tanlanmagan",
+                startCash: 0,
+                totals: { cash: 0, card: 0, debt: 0, expense: 0 },
+                cashInBox: 0,
+                closedAt: new Date().toISOString()
+            });
+
+            closeModals();
+            currentInput = "";
+            updateDisplay();
+            alert("Kun yopildi va hisobot arxivlandi!");
+        });
+
+        // ==============================================================
+        // 3. TO'LOVLAR (NAQD, KARTA, NASIYA, CHIQIM)
+        // ==============================================================
+        document.getElementById('btnPayCash').addEventListener('click', () => handleDirectPay('naqd'));
+        document.getElementById('btnPayCard').addEventListener('click', () => handleDirectPay('karta'));
+
+        function handleDirectPay(type) {
+            const amount = Number(currentInput);
+            if (!amount || amount <= 0) {
+                alert("Summani kiriting!");
+                return;
+            }
+
+            saveTx({
+                type: type,
+                amount: amount,
+                staff: currentShift.staff,
+                time: new Date().toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'}),
+                date: new Date().toISOString()
+            });
+
+            currentInput = "";
+            updateDisplay();
+        }
+
+        // Nasiya
+        document.getElementById('btnPayDebt').addEventListener('click', () => {
+            const amount = Number(currentInput);
+            if (!amount || amount <= 0) {
+                alert("Summani kiriting!");
+                return;
+            }
+            document.getElementById('debtAmountLabel').textContent = "Summa: " + formatSum(amount);
+            document.getElementById('debtModal').classList.add('active');
+        });
+
+        document.getElementById('btnConfirmDebt').addEventListener('click', () => {
+            const name = document.getElementById('debtCustomerName').value.trim();
+            const note = document.getElementById('debtNote').value.trim();
+            if (!name) {
+                alert("Mijoz ismini kiriting!");
+                return;
+            }
+
+            const amount = Number(currentInput);
+            saveTx({
+                type: 'nasiya',
+                amount: amount,
+                customer: name,
+                note: note,
+                staff: currentShift.staff,
+                time: new Date().toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'}),
+                date: new Date().toISOString()
+            });
+
+            document.getElementById('debtCustomerName').value = "";
+            document.getElementById('debtNote').value = "";
+            suggestBox.style.display = 'none';
+            closeModals();
+            currentInput = "";
+            updateDisplay();
+        });
+
+        // Chiqim
+        document.getElementById('btnPayExpense').addEventListener('click', () => {
+            const amount = Number(currentInput);
+            if (!amount || amount <= 0) {
+                alert("Summani kiriting!");
+                return;
+            }
+            document.getElementById('expenseAmountLabel').textContent = "Summa: " + formatSum(amount);
+            document.getElementById('expenseModal').classList.add('active');
+        });
+
+        document.getElementById('btnConfirmExpense').addEventListener('click', () => {
+            const reason = document.getElementById('expenseReason').value.trim();
+            if (!reason) {
+                alert("Chiqim sababini yozing!");
+                return;
+            }
+
+            const amount = Number(currentInput);
+            saveTx({
+                type: 'chiqim',
+                amount: amount,
+                reason: reason,
+                staff: currentShift.staff,
+                time: new Date().toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'}),
+                date: new Date().toISOString()
+            });
+
+            document.getElementById('expenseReason').value = "";
+            closeModals();
+            currentInput = "";
+            updateDisplay();
+        });
+
+        // Savdoni to'g'ridan-to'g'ri Firestore'ga yozish
+        async function saveTx(data) {
+            let updatedTotals = { ...shiftTotals };
+            if (data.type === 'naqd') updatedTotals.cash += data.amount;
+            if (data.type === 'karta') updatedTotals.card += data.amount;
+            if (data.type === 'nasiya') updatedTotals.debt += data.amount;
+            if (data.type === 'chiqim') updatedTotals.expense += data.amount;
+
+            const boxNow = currentShift.startCash + updatedTotals.cash - updatedTotals.expense;
+
+            // Bazaga yangi tranzaksiya yozish
+            await addDoc(collection(db, "kassa_savdo"), data);
+
+            // Bazadagi faol smenani yangilash (Bu orqali boshliqning telefoni ham bir zumda yangilanadi)
+            await setDoc(doc(db, "kassa_smena", "active"), {
+                isOpen: true,
+                staff: currentShift.staff,
+                startCash: currentShift.startCash,
+                startTime: currentShift.startTime,
+                totals: updatedTotals,
+                cashInBox: boxNow,
+                lastUpdated: new Date().toISOString()
+            }, { merge: true });
+        }
+
+        function renderFeedItem(data) {
+            const list = document.getElementById('txList');
+            const item = document.createElement('div');
+            item.className = 'feed-item';
+
+            let badge = `<span class="feed-type badge-cash">NAQD</span>`;
+            if (data.type === 'karta') badge = `<span class="feed-type badge-card">KARTA</span>`;
+            if (data.type === 'nasiya') badge = `<span class="feed-type badge-debt">NASIYA (${data.customer || ''})</span>`;
+            if (data.type === 'chiqim') badge = `<span class="feed-type badge-expense">CHIQIM (${data.reason || ''})</span>`;
+
+            item.innerHTML = `
+                <div>${badge} <span style="color:#6b7280; font-size:12px; margin-left:6px;">${data.time || ''}</span></div>
+                <div>${Number(data.amount || 0).toLocaleString('uz-UZ')} so'm</div>
+            `;
+            list.appendChild(item);
+        }
+
+        function syncUI() {
+            const dot = document.getElementById('statusDot');
+            const statusText = document.getElementById('shiftStatusText');
+            const staffText = document.getElementById('activeStaffText');
+
+            if (currentShift.isOpen) {
+                dot.classList.add('active');
+                statusText.textContent = "KUN OCHIQ";
+                staffText.textContent = "HODIM: " + (currentShift.staff ? currentShift.staff.toUpperCase() : "");
+                shiftActionBtn.textContent = "KUNNI YOPISH";
+                shiftActionBtn.className = "btn-shift btn-close-shift";
+            } else {
+                dot.classList.remove('active');
+                statusText.textContent = "KUN YOPIQ";
+                staffText.textContent = "HODIM: TANLANMAGAN";
+                shiftActionBtn.textContent = "KUNNI OCHISH";
+                shiftActionBtn.className = "btn-shift btn-open-shift";
+            }
+
+            // Statiskalarni yangilash
+            document.getElementById('statTotalCash').textContent = formatSum(shiftTotals.cash);
+            document.getElementById('statTotalCard').textContent = formatSum(shiftTotals.card);
+            document.getElementById('statTotalDebt').textContent = formatSum(shiftTotals.debt);
+            document.getElementById('statTotalExpense').textContent = formatSum(shiftTotals.expense);
+
+            const box = currentShift.startCash + shiftTotals.cash - shiftTotals.expense;
+            document.getElementById('statCashInBox').textContent = formatSum(box);
+        }
+
+        function closeModals() {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+            suggestBox.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
