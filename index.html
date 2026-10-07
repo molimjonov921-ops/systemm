@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Magazin Kassa & Nazorat</title>
+    <title>Magazin Kassa & Nasiya Tizimi</title>
 
     <style>
         * {
@@ -11,7 +11,7 @@
             margin: 0;
             padding: 0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-weight: 800; /* Barcha yozuvlar qalin BOLD */
+            font-weight: 800; /* Hamma yozuvlar qalin BOLD */
             user-select: none;
             -webkit-user-select: none;
         }
@@ -24,26 +24,51 @@
             flex-direction: column;
         }
 
-        /* Yuqori Panel */
+        /* Yuqori Panel va Bo'limlar */
         header {
             background-color: #111827;
-            padding: 14px 20px;
+            padding: 12px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 2px solid #1f2937;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .tab-btn {
+            background: #1f2937;
+            color: #9ca3af;
+            border: 2px solid #374151;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #3b82f6;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
         }
 
         .status-badge {
             display: flex;
             align-items: center;
-            gap: 12px;
-            font-size: 16px;
+            gap: 10px;
+            font-size: 15px;
         }
 
         .dot {
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             border-radius: 50%;
             background: #ef4444;
             box-shadow: 0 0 8px #ef4444;
@@ -54,26 +79,34 @@
         }
 
         .btn-shift {
-            padding: 10px 22px;
+            padding: 9px 18px;
             border-radius: 10px;
             cursor: pointer;
             border: none;
-            font-size: 15px;
-            letter-spacing: 0.5px;
+            font-size: 14px;
         }
         .btn-open-shift { background: #10b981; color: #ffffff; }
         .btn-close-shift { background: #ef4444; color: #ffffff; }
 
         /* Asosiy Ekran */
-        .main-container {
+        .content-section {
+            display: none;
+            flex: 1;
+        }
+
+        .content-section.active {
+            display: flex;
+        }
+
+        /* ================= 1. KASSA BO'LIMI ================= */
+        .kassa-container {
             display: grid;
             grid-template-columns: 1.15fr 0.85fr;
             gap: 16px;
             padding: 16px;
-            flex: 1;
+            width: 100%;
         }
 
-        /* Chap tomon: Kassa & Kalkulyator */
         .pos-section {
             display: flex;
             flex-direction: column;
@@ -91,7 +124,6 @@
         .display-label {
             font-size: 13px;
             color: #9ca3af;
-            letter-spacing: 1px;
         }
 
         .display-amount {
@@ -155,7 +187,7 @@
         .btn-debt { background: #ea580c; }
         .btn-expense { background: #dc2626; }
 
-        /* O‘ng tomon: Boshliq Paneli */
+        /* Monitoring Paneli */
         .admin-section {
             background: #111827;
             border-radius: 14px;
@@ -196,7 +228,6 @@
         .val-debt { color: #fb923c; }
         .val-expense { color: #f87171; }
 
-        /* Jonli Lenta */
         .feed-container {
             flex: 1;
             background: #030712;
@@ -205,14 +236,6 @@
             padding: 12px;
             overflow-y: auto;
             max-height: 280px;
-        }
-
-        .feed-title {
-            font-size: 14px;
-            color: #9ca3af;
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
         }
 
         .feed-item {
@@ -235,6 +258,121 @@
         .badge-debt { background: #ea580c33; color: #fb923c; border: 1px solid #ea580c; }
         .badge-expense { background: #dc262633; color: #f87171; border: 1px solid #dc2626; }
 
+        /* ================= 2. NASIYA DAFTARI BO'LIMI ================= */
+        .debt-ledger-container {
+            padding: 16px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .debt-header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #111827;
+            padding: 16px;
+            border-radius: 14px;
+            border: 2px solid #1f2937;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .debt-stats-box {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .btn-add-client {
+            background: #10b981;
+            color: #ffffff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.3);
+        }
+
+        .debtors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 14px;
+        }
+
+        .debtor-card {
+            background: #111827;
+            border: 2px solid #1f2937;
+            border-radius: 14px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .debtor-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .debtor-name {
+            font-size: 18px;
+            color: #f3f4f6;
+        }
+
+        .debtor-tg-link {
+            color: #38bdf8;
+            font-size: 13px;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #030712;
+            padding: 6px 10px;
+            border-radius: 8px;
+            border: 1px solid #374151;
+        }
+
+        .debtor-balance {
+            font-size: 26px;
+            color: #fb923c;
+            background: #030712;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid #1f2937;
+        }
+
+        .debtor-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-pay-debt {
+            flex: 1;
+            background: #16a34a;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .btn-view-history {
+            background: #1f2937;
+            color: #9ca3af;
+            border: 1px solid #374151;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
         /* Modallar */
         .modal {
             display: none;
@@ -244,6 +382,8 @@
             align-items: center;
             justify-content: center;
             z-index: 999;
+            padding: 16px;
+            overflow-y: auto;
         }
 
         .modal.active { display: flex; }
@@ -252,29 +392,90 @@
             background: #111827;
             border: 2px solid #374151;
             border-radius: 16px;
-            padding: 24px;
-            width: 90%;
-            max-width: 440px;
+            padding: 22px;
+            width: 100%;
+            max-width: 520px;
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            position: relative;
+            gap: 12px;
         }
 
-        .modal-card select, .modal-card input {
+        .modal-card label {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: -4px;
+        }
+
+        .modal-card input, .modal-card select {
             background: #030712;
             border: 2px solid #374151;
             color: #ffffff;
-            padding: 14px;
+            padding: 12px 14px;
             border-radius: 10px;
             font-size: 16px;
             outline: none;
         }
 
+        .modal-card input:focus {
+            border-color: #38bdf8;
+        }
+
+        .quick-debtors-selection {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            max-height: 180px;
+            overflow-y: auto;
+            background: #030712;
+            padding: 6px;
+            border-radius: 10px;
+            border: 1px solid #374151;
+        }
+
+        .debtor-chip {
+            background: #1f2937;
+            border: 2px solid #374151;
+            color: #f3f4f6;
+            padding: 12px 10px;
+            border-radius: 10px;
+            font-size: 14px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .debtor-chip.selected {
+            background: #ea580c;
+            border-color: #fb923c;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(234, 88, 12, 0.4);
+        }
+
+        .family-chips-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .family-chip {
+            background: #1f2937;
+            border: 1px solid #374151;
+            color: #9ca3af;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .family-chip.active {
+            background: #38bdf8;
+            border-color: #0284c7;
+            color: #030712;
+        }
+
         .modal-actions {
             display: flex;
             gap: 12px;
-            margin-top: 8px;
+            margin-top: 6px;
         }
 
         .modal-actions button {
@@ -289,173 +490,244 @@
         .btn-confirm { background: #10b981; color: #ffffff; }
         .btn-cancel { background: #374151; color: #ffffff; }
 
-        .suggestions-box {
-            position: absolute;
-            top: 150px;
-            left: 24px;
-            right: 24px;
-            background: #1f2937;
-            border: 2px solid #4b5563;
-            border-radius: 10px;
-            max-height: 180px;
-            overflow-y: auto;
-            z-index: 1000;
-            display: none;
-        }
-
-        .suggestion-item {
-            padding: 12px 14px;
-            border-bottom: 1px solid #374151;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .suggestion-item:hover, .suggestion-item:active {
-            background: #374151;
-            color: #38bdf8;
-        }
-
         @media (max-width: 900px) {
-            .main-container { grid-template-columns: 1fr; }
+            .kassa-container { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Yuqori Panel va Bo'limlar almashishi -->
     <header>
+        <div class="nav-tabs">
+            <button class="tab-btn active" id="tabBtnKassa" onclick="switchTab('kassa')">💰 KASSA</button>
+            <button class="tab-btn" id="tabBtnDebt" onclick="switchTab('debt')">📒 NASIYA DAFTARI</button>
+        </div>
+
         <div class="status-badge">
             <span class="dot" id="statusDot"></span>
             <span id="shiftStatusText">KUN YOPIQ</span>
             <span style="color: #4b5563;">|</span>
             <span id="activeStaffText">HODIM: TANLANMAGAN</span>
         </div>
+
         <div>
             <button class="btn-shift btn-open-shift" id="shiftActionBtn">KUNNI OCHISH</button>
         </div>
     </header>
 
-    <div class="main-container">
-        <!-- Chap: Kassa -->
-        <div class="pos-section">
-            <div class="display-screen">
-                <div class="display-label">SUMMA:</div>
-                <div class="display-amount" id="displayAmount">0</div>
-            </div>
-
-            <div class="keypad-grid">
-                <button class="key-btn" data-key="1">1</button>
-                <button class="key-btn" data-key="2">2</button>
-                <button class="key-btn" data-key="3">3</button>
-                <button class="key-btn" data-key="4">4</button>
-                <button class="key-btn" data-key="5">5</button>
-                <button class="key-btn" data-key="6">6</button>
-                <button class="key-btn" data-key="7">7</button>
-                <button class="key-btn" data-key="8">8</button>
-                <button class="key-btn" data-key="9">9</button>
-                <button class="key-btn action" id="clearBtn">C</button>
-                <button class="key-btn" data-key="0">0</button>
-                <button class="key-btn action" data-key="000">000</button>
-            </div>
-
-            <div class="pay-buttons-grid">
-                <button class="pay-btn btn-cash" id="btnPayCash">NAQD</button>
-                <button class="pay-btn btn-card" id="btnPayCard">KARTA</button>
-                <button class="pay-btn btn-debt" id="btnPayDebt">NASIYA</button>
-                <button class="pay-btn btn-expense" id="btnPayExpense">CHIQIM</button>
-            </div>
-        </div>
-
-        <!-- O‘ng: Boshliq Nazorat Paneli -->
-        <div class="admin-section">
-            <div class="stat-grid">
-                <div class="stat-card full" style="border-left: 5px solid #38bdf8;">
-                    <div class="stat-title">G'ALADONDAGI SOF NAQD PUL:</div>
-                    <div class="stat-val val-cash" id="statCashInBox">0 so'm</div>
+    <!-- 1. KASSA ASOSIY EKRANI -->
+    <div class="content-section active" id="sectionKassa">
+        <div class="kassa-container">
+            <div class="pos-section">
+                <div class="display-screen">
+                    <div class="display-label">SUMMA:</div>
+                    <div class="display-amount" id="displayAmount">0</div>
                 </div>
 
-                <div class="stat-card">
-                    <div class="stat-title">BUGUNGI NAQD:</div>
-                    <div class="stat-val val-cash" id="statTotalCash">0 so'm</div>
+                <div class="keypad-grid">
+                    <button class="key-btn" data-key="1">1</button>
+                    <button class="key-btn" data-key="2">2</button>
+                    <button class="key-btn" data-key="3">3</button>
+                    <button class="key-btn" data-key="4">4</button>
+                    <button class="key-btn" data-key="5">5</button>
+                    <button class="key-btn" data-key="6">6</button>
+                    <button class="key-btn" data-key="7">7</button>
+                    <button class="key-btn" data-key="8">8</button>
+                    <button class="key-btn" data-key="9">9</button>
+                    <button class="key-btn action" id="clearBtn">C</button>
+                    <button class="key-btn" data-key="0">0</button>
+                    <button class="key-btn action" data-key="000">000</button>
                 </div>
 
-                <div class="stat-card">
-                    <div class="stat-title">BUGUNGI KARTA / CLICK:</div>
-                    <div class="stat-val val-card" id="statTotalCard">0 so'm</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-title">BUGUNGI NASIYA:</div>
-                    <div class="stat-val val-debt" id="statTotalDebt">0 so'm</div>
-                </div>
-
-                <div class="stat-card">
-                    <div class="stat-title">BUGUNGI CHIQIM:</div>
-                    <div class="stat-val val-expense" id="statTotalExpense">0 so'm</div>
+                <div class="pay-buttons-grid">
+                    <button class="pay-btn btn-cash" id="btnPayCash">NAQD</button>
+                    <button class="pay-btn btn-card" id="btnPayCard">KARTA</button>
+                    <button class="pay-btn btn-debt" id="btnPayDebt">NASIYA</button>
+                    <button class="pay-btn btn-expense" id="btnPayExpense">CHIQIM</button>
                 </div>
             </div>
 
-            <!-- Jonli Lenta -->
-            <div class="feed-container">
-                <div class="feed-title">
-                    <span>JONLI SAVDOLAR:</span>
-                    <span id="liveClock" style="color: #38bdf8;"></span>
+            <!-- Monitoring -->
+            <div class="admin-section">
+                <div class="stat-grid">
+                    <div class="stat-card full" style="border-left: 5px solid #38bdf8;">
+                        <div class="stat-title">G'ALADONDAGI SOF NAQD PUL:</div>
+                        <div class="stat-val val-cash" id="statCashInBox">0 so'm</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-title">BUGUNGI NAQD:</div>
+                        <div class="stat-val val-cash" id="statTotalCash">0 so'm</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-title">BUGUNGI KARTA / CLICK:</div>
+                        <div class="stat-val val-card" id="statTotalCard">0 so'm</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-title">BUGUNGI NASIYA:</div>
+                        <div class="stat-val val-debt" id="statTotalDebt">0 so'm</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-title">BUGUNGI CHIQIM:</div>
+                        <div class="stat-val val-expense" id="statTotalExpense">0 so'm</div>
+                    </div>
                 </div>
-                <div id="txList"></div>
+
+                <div class="feed-container">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; color:#9ca3af;">
+                        <span>JONLI SAVDOLAR:</span>
+                        <span id="liveClock" style="color: #38bdf8;"></span>
+                    </div>
+                    <div id="txList"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Modallar -->
+    <!-- 2. NASIYA DAFTARI EKRANI -->
+    <div class="content-section" id="sectionDebt">
+        <div class="debt-ledger-container">
+            <div class="debt-header-bar">
+                <div class="debt-stats-box">
+                    <div>
+                        <div style="font-size:12px; color:#9ca3af;">BOZOR NASIYASI (JAMI QARZ):</div>
+                        <div style="font-size:26px; color:#fb923c;" id="ledgerTotalDebt">0 so'm</div>
+                    </div>
+                    <div style="border-left:2px solid #374151; padding-left:16px;">
+                        <div style="font-size:12px; color:#9ca3af;">MIJOZLAR SONI:</div>
+                        <div style="font-size:26px; color:#38bdf8;" id="ledgerClientCount">0 ta</div>
+                    </div>
+                </div>
+
+                <button class="btn-add-client" onclick="openAddClientModal()">➕ Yangi Mijoz Qo'shish</button>
+            </div>
+
+            <!-- Nasiyachilar Ro'yxati Kartochkalari -->
+            <div class="debtors-grid" id="debtorsListContainer">
+                <!-- Javascript orqali yuklanadi -->
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 1: YANGI MIJOZ QO'SHISH -->
+    <div class="modal" id="addClientModal">
+        <div class="modal-card">
+            <h3 style="color:#10b981;">➕ YANGI NASIYA MIJOZI QO'SHISH</h3>
+            <label>Mijozning to'liq ismi:</label>
+            <input type="text" id="newClientName" placeholder="Masalan: Akmal aka sartarosh">
+            
+            <label>Telegram manzili (username yoki link):</label>
+            <input type="text" id="newClientTg" placeholder="Masalan: @akmal_aka yoki t.me/akmal_aka">
+
+            <label>Telefon raqami (ixtiyoriy):</label>
+            <input type="text" id="newClientPhone" placeholder="+998 90 123 45 67">
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
+                <button class="btn-confirm" id="btnSaveNewClient">SAQLASH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 2: KASSADA NASIYA URISH VA TELEGRAMGA CHIQISH -->
+    <div class="modal" id="debtModal">
+        <div class="modal-card">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h3 style="color: #fb923c;">NASIYA YOZISH</h3>
+                <span id="debtModalAmount" style="color:#38bdf8; font-size:22px;">0 so'm</span>
+            </div>
+
+            <label>Qaysi mijozga yozilsin?</label>
+            <div class="quick-debtors-selection" id="quickDebtorsContainer">
+                <!-- Javascript orqali to'ldiriladi -->
+            </div>
+
+            <label>Oiladan kim oldi?</label>
+            <div class="family-chips-grid">
+                <span class="family-chip active" onclick="setFamilyMember('O\'zi', this)">O'zi</span>
+                <span class="family-chip" onclick="setFamilyMember('O\'g\'li', this)">O'g'li</span>
+                <span class="family-chip" onclick="setFamilyMember('Ayoli', this)">Ayoli</span>
+                <span class="family-chip" onclick="setFamilyMember('Qizi', this)">Qizi</span>
+                <span class="family-chip" onclick="setFamilyMember('Ukasi', this)">Ukasi</span>
+                <span class="family-chip" onclick="setFamilyMember('Boshqa', this)">Boshqa</span>
+            </div>
+
+            <label>Nimalar oldi? (Mahsulotlar):</label>
+            <input type="text" id="debtProducts" placeholder="Masalan: 1 qop un, 2 ta yog', shakar">
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
+                <button class="btn-confirm" style="background:#ea580c;" id="btnConfirmDebt">🚀 SAQLASH VA TELEGRAMGA O'TISH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 3: QARZ TO'LOVINI QABUL QILISH -->
+    <div class="modal" id="payDebtModal">
+        <div class="modal-card">
+            <h3 style="color:#10b981;">QARZNI QABUL QILISH (TO'LASH)</h3>
+            <p id="payDebtClientName" style="color:#38bdf8; font-size:18px;"></p>
+            <p id="payDebtClientCurrent" style="color:#fb923c; font-size:15px; margin-bottom:8px;"></p>
+
+            <label>To'langan summa (so'm):</label>
+            <input type="number" id="payDebtAmountInput" placeholder="Masalan: 100000">
+
+            <label>Qanday to'ladi?</label>
+            <select id="payDebtMethod">
+                <option value="naqd">Naqd pul qilib berdi</option>
+                <option value="karta">Karta / Click orqali o'tkazdi</option>
+            </select>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
+                <button class="btn-confirm" id="btnConfirmPayDebt">QABUL QILISH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL 4: KUNNI OCHISH -->
     <div class="modal" id="openShiftModal">
         <div class="modal-card">
             <h3 style="color: #10b981;">KUNNI OCHISH</h3>
-            <label style="font-size: 13px; color: #9ca3af;">Xodimni tanlang:</label>
+            <label>Xodimni tanlang:</label>
             <select id="selectStaff">
                 <option value="Muzaffar">Muzaffar</option>
                 <option value="Ulugbek">Ulug'bek</option>
             </select>
-            <label style="font-size: 13px; color: #9ca3af;">Kassadagi boshlang'ich naqd pul (so'm):</label>
+            <label>Kassadagi boshlang'ich naqd pul (so'm):</label>
             <input type="number" id="startCashInput" placeholder="Masalan: 200000" value="0">
             <div class="modal-actions">
-                <button class="btn-cancel" id="btnCancelOpen">BEKOR QILISH</button>
+                <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
                 <button class="btn-confirm" id="btnConfirmOpen">OCHISH</button>
             </div>
         </div>
     </div>
 
+    <!-- MODAL 5: KUNNI YOPISH -->
     <div class="modal" id="closeShiftModal">
         <div class="modal-card">
             <h3 style="color: #f87171;">KUNNI YOPISH (Z-HISOBOT)</h3>
             <div id="closeShiftSummary" style="font-size: 15px; line-height: 1.8; color: #e5e7eb;"></div>
             <div class="modal-actions">
-                <button class="btn-cancel" id="btnCancelClose">ORQAGA</button>
+                <button class="btn-cancel" onclick="closeModals()">ORQAGA</button>
                 <button class="btn-confirm" style="background: #dc2626;" id="btnConfirmClose">YOPISH VA SAQLASH</button>
             </div>
         </div>
     </div>
 
-    <div class="modal" id="debtModal">
-        <div class="modal-card">
-            <h3 style="color: #fb923c;">NASIYA QO'SHISH</h3>
-            <p id="debtAmountLabel" style="color: #38bdf8; font-size: 22px;"></p>
-            <input type="text" id="debtCustomerName" placeholder="Mijoz ismi (yozishni boshlang...)" autocomplete="off">
-            <div id="customerSuggestions" class="suggestions-box"></div>
-            <input type="text" id="debtNote" placeholder="Izoh (masalan: un, yog')">
-            <div class="modal-actions">
-                <button class="btn-cancel" id="btnCancelDebt">BEKOR QILISH</button>
-                <button class="btn-confirm" id="btnConfirmDebt">SAQLASH</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- MODAL 6: CHIQIM -->
     <div class="modal" id="expenseModal">
         <div class="modal-card">
             <h3 style="color: #f87171;">KASSADAN CHIQIM QILISH</h3>
             <p id="expenseAmountLabel" style="color: #38bdf8; font-size: 22px;"></p>
-            <input type="text" id="expenseReason" placeholder="Qayerga ketdi? (Optom, non, xarajat)">
+            <label>Qayerga ketdi? (Sababi):</label>
+            <input type="text" id="expenseReason" placeholder="Optom, non, shaxsiy rasxod...">
             <div class="modal-actions">
-                <button class="btn-cancel" id="btnCancelExpense">BEKOR QILISH</button>
+                <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
                 <button class="btn-confirm" style="background: #dc2626;" id="btnConfirmExpense">TASDIQLASH</button>
             </div>
         </div>
@@ -480,8 +752,10 @@
         const db = getFirestore(app);
 
         let currentInput = "";
-        let existingCustomers = [];
-        let selectedCustomerData = null;
+        let selectedFamilyMember = "O'zi";
+        let selectedDebtClient = null;
+        let payingClient = null;
+        let allDebtors = [];
 
         let currentShift = {
             isOpen: false,
@@ -506,7 +780,296 @@
             return Number(val || 0).toLocaleString('uz-UZ') + " so'm";
         }
 
-        // 1. REAL-TIME BAZA SINXRONIZATSIYASI
+        // BO'LIMLARNI ALMASHTIRISH (Kassa / Nasiya Daftari)
+        window.switchTab = function(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
+
+            if (tab === 'kassa') {
+                document.getElementById('tabBtnKassa').classList.add('active');
+                document.getElementById('sectionKassa').classList.add('active');
+            } else {
+                document.getElementById('tabBtnDebt').classList.add('active');
+                document.getElementById('sectionDebt').classList.add('active');
+            }
+        };
+
+        window.setFamilyMember = function(member, el) {
+            selectedFamilyMember = member;
+            document.querySelectorAll('.family-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+        };
+
+        window.closeModals = function() {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+        };
+
+        // =========================================================================
+        // 1. NASIYA MIJOZLARINI FIRESTORE'DAN JONLI O'QISH
+        // =========================================================================
+        onSnapshot(collection(db, "nasiya_mijozlar"), (snapshot) => {
+            allDebtors = [];
+            let totalMarketDebt = 0;
+
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const client = {
+                    id: doc.id,
+                    name: data.name,
+                    telegram: data.telegram || "",
+                    phone: data.phone || "",
+                    totalDebt: Number(data.totalDebt || 0)
+                };
+                allDebtors.push(client);
+                totalMarketDebt += client.totalDebt;
+            });
+
+            // Nasiya daftari statistikalari
+            document.getElementById('ledgerTotalDebt').textContent = formatSum(totalMarketDebt);
+            document.getElementById('ledgerClientCount').textContent = allDebtors.length + " ta";
+
+            renderDebtorsLedger();
+            renderQuickDebtorsCheckout();
+        });
+
+        // Nasiya daftari ro'yxatini chizish
+        function renderDebtorsLedger() {
+            const container = document.getElementById('debtorsListContainer');
+            container.innerHTML = "";
+
+            if (allDebtors.length === 0) {
+                container.innerHTML = `<div style="color:#6b7280; font-size:16px;">Hozircha mijozlar qo'shilmagan. Yuqoridagi "Yangi Mijoz Qo'shish" tugmasini bosing.</div>`;
+                return;
+            }
+
+            allDebtors.forEach(client => {
+                const tgUser = (client.telegram || '').replace('@', '').replace('https://t.me/', '').trim();
+                const card = document.createElement('div');
+                card.className = "debtor-card";
+                card.innerHTML = `
+                    <div class="debtor-card-header">
+                        <span class="debtor-name">👤 ${client.name}</span>
+                        ${tgUser ? `<a href="https://t.me/${tgUser}" target="_blank" class="debtor-tg-link">✈️ @${tgUser}</a>` : `<span style="font-size:12px; color:#6b7280;">TG yo'q</span>`}
+                    </div>
+                    <div class="debtor-balance">${formatSum(client.totalDebt)}</div>
+                    <div class="debtor-actions">
+                        <button class="btn-pay-debt" onclick="openPayDebtModal('${client.id}')">💵 Qarz to'lash</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Kassadagi Nasiya oynasida tanlash tugmalari
+        function renderQuickDebtorsCheckout() {
+            const container = document.getElementById('quickDebtorsContainer');
+            container.innerHTML = "";
+
+            if (allDebtors.length === 0) {
+                container.innerHTML = `<div style="grid-column:span 2; font-size:13px; color:#9ca3af; padding:8px;">Avval "Nasiya Daftari" bo'limiga o'tib mijozlarni qo'shib oling.</div>`;
+                return;
+            }
+
+            allDebtors.forEach((client, idx) => {
+                const btn = document.createElement('div');
+                btn.className = "debtor-chip";
+                btn.innerHTML = `👤 ${client.name}`;
+                btn.onclick = () => {
+                    document.querySelectorAll('.debtor-chip').forEach(el => el.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    selectedDebtClient = client;
+                };
+                container.appendChild(btn);
+            });
+
+            // Birinchisini tanlab qo'yish
+            if (allDebtors.length > 0 && container.children[0]) {
+                container.children[0].classList.add('selected');
+                selectedDebtClient = allDebtors[0];
+            }
+        }
+
+        // =========================================================================
+        // 2. YANGI MIJOZ QO'SHISH (FIRESTORE)
+        // =========================================================================
+        window.openAddClientModal = function() {
+            document.getElementById('newClientName').value = "";
+            document.getElementById('newClientTg').value = "";
+            document.getElementById('newClientPhone').value = "";
+            document.getElementById('addClientModal').classList.add('active');
+        };
+
+        document.getElementById('btnSaveNewClient').addEventListener('click', async () => {
+            const name = document.getElementById('newClientName').value.trim();
+            const tg = document.getElementById('newClientTg').value.trim();
+            const phone = document.getElementById('newClientPhone').value.trim();
+
+            if (!name) {
+                alert("Mijoz ismini kiriting!");
+                return;
+            }
+
+            await addDoc(collection(db, "nasiya_mijozlar"), {
+                name: name,
+                telegram: tg,
+                phone: phone,
+                totalDebt: 0,
+                createdAt: new Date().toISOString()
+            });
+
+            closeModals();
+            alert(`"${name}" nasiya daftariga qo'shildi!`);
+        });
+
+        // =========================================================================
+        // 3. KASSADA NASIYA URISH VA TELEGRAMGA O'TISH
+        // =========================================================================
+        document.getElementById('btnPayDebt').addEventListener('click', () => {
+            const amount = Number(currentInput);
+            if (!amount || amount <= 0) {
+                alert("Summani kiriting!");
+                return;
+            }
+            document.getElementById('debtModalAmount').textContent = formatSum(amount);
+            document.getElementById('debtModal').classList.add('active');
+        });
+
+        document.getElementById('btnConfirmDebt').addEventListener('click', async () => {
+            if (!selectedDebtClient) {
+                alert("Mijozni tanlang!");
+                return;
+            }
+
+            const amount = Number(currentInput);
+            const products = document.getElementById('debtProducts').value.trim() || "Nasiya tovar";
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'});
+            const dateStr = now.toISOString();
+            const formattedDate = now.toLocaleString('uz-UZ');
+
+            // 1. Kassa hisobotiga yozamiz
+            saveTx({
+                type: 'nasiya',
+                amount: amount,
+                customer: `${selectedDebtClient.name} (${selectedFamilyMember})`,
+                note: products,
+                staff: currentShift.staff,
+                time: timeStr,
+                date: dateStr
+            });
+
+            // 2. Mijozning jami qarzini oshiramiz
+            const clientRef = doc(db, "nasiya_mijozlar", selectedDebtClient.id);
+            const newTotalDebt = (selectedDebtClient.totalDebt || 0) + amount;
+            await updateDoc(clientRef, {
+                totalDebt: newTotalDebt,
+                lastDebtDate: formattedDate
+            });
+
+            // 3. Nasiya tarixiga yozamiz
+            await addDoc(collection(db, "nasiya_tarix"), {
+                clientId: selectedDebtClient.id,
+                clientName: selectedDebtClient.name,
+                type: "qarz",
+                amount: amount,
+                products: products,
+                familyMember: selectedFamilyMember,
+                staff: currentShift.staff,
+                date: formattedDate,
+                timestamp: Date.now()
+            });
+
+            // 4. TELEGRAMGA TO'G'RIDAN-TO'G'RI O'TISH
+            const tgUser = (selectedDebtClient.telegram || '').replace('@', '').replace('https://t.me/', '').trim();
+            const xabarMatni = `🏪 Mahalla Market:\n👤 Hurmatli ${selectedDebtClient.name}!\n👨‍👩‍👦 Kim oldi: ${selectedFamilyMember}\n🛒 Mahsulotlar: ${products}\n💰 Olingan summa: +${Number(amount).toLocaleString('uz-UZ')} so'm\n📊 Jami umumiy qarzingiz: ${Number(newTotalDebt).toLocaleString('uz-UZ')} so'm\n🕒 Sana: ${formattedDate}\n\nKassir: ${currentShift.staff}`;
+
+            navigator.clipboard.writeText(xabarMatni).catch(() => {});
+
+            if (tgUser) {
+                window.open(`https://t.me/${tgUser}`, '_blank');
+            } else {
+                window.open(`https://t.me/share/url?url=&text=${encodeURIComponent(xabarMatni)}`, '_blank');
+            }
+
+            document.getElementById('debtProducts').value = "";
+            closeModals();
+            currentInput = "";
+            updateDisplay();
+        });
+
+        // =========================================================================
+        // 4. QARZ TO'LOVINI QABUL QILISH (Qarz kamayadi, Kassaga pul kiradi)
+        // =========================================================================
+        window.openPayDebtModal = function(clientId) {
+            payingClient = allDebtors.find(c => c.id === clientId);
+            if (!payingClient) return;
+
+            document.getElementById('payDebtClientName').textContent = `Mijoz: ${payingClient.name}`;
+            document.getElementById('payDebtClientCurrent').textContent = `Hozirgi qarzi: ${formatSum(payingClient.totalDebt)}`;
+            document.getElementById('payDebtAmountInput').value = "";
+            document.getElementById('payDebtModal').classList.add('active');
+        };
+
+        document.getElementById('btnConfirmPayDebt').addEventListener('click', async () => {
+            const payAmount = Number(document.getElementById('payDebtAmountInput').value);
+            const method = document.getElementById('payDebtMethod').value;
+
+            if (!payAmount || payAmount <= 0) {
+                alert("To'lov summasini kiriting!");
+                return;
+            }
+
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'});
+            const formattedDate = now.toLocaleString('uz-UZ');
+
+            // 1. Mijoz qarzini kamaytiramiz
+            const newTotalDebt = Math.max(0, (payingClient.totalDebt || 0) - payAmount);
+            await updateDoc(doc(db, "nasiya_mijozlar", payingClient.id), {
+                totalDebt: newTotalDebt,
+                lastPaymentDate: formattedDate
+            });
+
+            // 2. Qarz tarixiga to'lov qilib yozamiz
+            await addDoc(collection(db, "nasiya_tarix"), {
+                clientId: payingClient.id,
+                clientName: payingClient.name,
+                type: "tolov",
+                amount: payAmount,
+                method: method,
+                staff: currentShift.staff || "Boshliq",
+                date: formattedDate,
+                timestamp: Date.now()
+            });
+
+            // 3. Agar kun ochiq bo'lsa, kassaga kirim qilamiz
+            if (currentShift.isOpen) {
+                saveTx({
+                    type: method,
+                    amount: payAmount,
+                    customer: `Qarz to'lovi (${payingClient.name})`,
+                    staff: currentShift.staff,
+                    time: timeStr,
+                    date: now.toISOString()
+                });
+            }
+
+            // Telegramga xabar
+            const tgUser = (payingClient.telegram || '').replace('@', '').replace('https://t.me/', '').trim();
+            const xabarMatni = `✅ Qarz to'lovi qabul qilindi!\n👤 Mijoz: ${payingClient.name}\n💵 To'langan: ${Number(payAmount).toLocaleString('uz-UZ')} so'm\n📊 Qolgan qarzingiz: ${Number(newTotalDebt).toLocaleString('uz-UZ')} so'm\n🕒 Sana: ${formattedDate}\n\nRahmat!`;
+            
+            navigator.clipboard.writeText(xabarMatni).catch(() => {});
+            if (tgUser) {
+                window.open(`https://t.me/${tgUser}`, '_blank');
+            }
+
+            closeModals();
+            alert("To'lov muvaffaqiyatli qabul qilindi!");
+        });
+
+        // =========================================================================
+        // 5. KASSA SMENA & TRANZAKSIYALAR
+        // =========================================================================
         onSnapshot(doc(db, "kassa_smena", "active"), (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
@@ -534,7 +1097,6 @@
             syncUI();
         });
 
-        // Jonli kassa lentasi
         const qTx = query(collection(db, "kassa_savdo"), orderBy("date", "desc"), limit(50));
         onSnapshot(qTx, (snapshot) => {
             const list = document.getElementById('txList');
@@ -545,85 +1107,6 @@
             });
         });
 
-        // QARZLARNI ANIQ NOMLAR BILAN O'QISH: "old_debtors" VA "trusted_debtors"
-        function loadExistingDebtors() {
-            try {
-                onSnapshot(collection(db, "old_debtors"), (snap) => {
-                    snap.forEach(d => {
-                        const val = d.data();
-                        const name = val.name;
-                        if (name) {
-                            const idx = existingCustomers.findIndex(c => c.id === d.id);
-                            const item = {
-                                id: d.id,
-                                coll: "old_debtors",
-                                name: name,
-                                amount: Number(val.amount || 0),
-                                phone: val.phone || ""
-                            };
-                            if (idx >= 0) existingCustomers[idx] = item;
-                            else existingCustomers.push(item);
-                        }
-                    });
-                });
-
-                onSnapshot(collection(db, "trusted_debtors"), (snap) => {
-                    snap.forEach(d => {
-                        const val = d.data();
-                        const name = val.name;
-                        if (name) {
-                            const idx = existingCustomers.findIndex(c => c.id === d.id);
-                            const item = {
-                                id: d.id,
-                                coll: "trusted_debtors",
-                                name: name,
-                                amount: Number(val.amount || 0),
-                                phone: val.phone || ""
-                            };
-                            if (idx >= 0) existingCustomers[idx] = item;
-                            else existingCustomers.push(item);
-                        }
-                    });
-                });
-            } catch(e) {}
-        }
-        loadExistingDebtors();
-
-        // Autocomplete qidiruv
-        const searchInput = document.getElementById('debtCustomerName');
-        const suggestBox = document.getElementById('customerSuggestions');
-
-        searchInput.addEventListener('input', (e) => {
-            const queryText = e.target.value.toLowerCase().trim();
-            selectedCustomerData = null;
-            
-            if (!queryText) {
-                suggestBox.style.display = 'none';
-                return;
-            }
-
-            const matched = existingCustomers.filter(c => c.name.toLowerCase().includes(queryText));
-            if (matched.length === 0) {
-                suggestBox.style.display = 'none';
-                return;
-            }
-
-            suggestBox.innerHTML = '';
-            matched.forEach(c => {
-                const item = document.createElement('div');
-                item.className = 'suggestion-item';
-                item.innerHTML = `<span>${c.name}</span><span style="color:#fb923c;">${Number(c.amount).toLocaleString('uz-UZ')} so'm</span>`;
-                item.onclick = () => {
-                    searchInput.value = c.name;
-                    selectedCustomerData = c;
-                    suggestBox.style.display = 'none';
-                };
-                suggestBox.appendChild(item);
-            });
-            suggestBox.style.display = 'block';
-        });
-
-        // Raqamlar bosilganda
         document.querySelectorAll('.key-btn[data-key]').forEach(btn => {
             btn.addEventListener('click', () => {
                 if (!currentShift.isOpen) {
@@ -647,7 +1130,6 @@
             el.textContent = currentInput ? Number(currentInput).toLocaleString('uz-UZ') : "0";
         }
 
-        // Smenani boshqarish
         const shiftActionBtn = document.getElementById('shiftActionBtn');
         shiftActionBtn.addEventListener('click', () => {
             if (!currentShift.isOpen) {
@@ -657,11 +1139,6 @@
                 document.getElementById('closeShiftModal').classList.add('active');
             }
         });
-
-        document.getElementById('btnCancelOpen').addEventListener('click', closeModals);
-        document.getElementById('btnCancelClose').addEventListener('click', closeModals);
-        document.getElementById('btnCancelDebt').addEventListener('click', closeModals);
-        document.getElementById('btnCancelExpense').addEventListener('click', closeModals);
 
         document.getElementById('btnConfirmOpen').addEventListener('click', async () => {
             const staff = document.getElementById('selectStaff').value;
@@ -720,7 +1197,6 @@
             alert("Kun yopildi va arxivlandi!");
         });
 
-        // To'lovlar
         document.getElementById('btnPayCash').addEventListener('click', () => handleDirectPay('naqd'));
         document.getElementById('btnPayCard').addEventListener('click', () => handleDirectPay('karta'));
 
@@ -743,80 +1219,6 @@
             updateDisplay();
         }
 
-        // NASIYA BOSILGANDA
-        document.getElementById('btnPayDebt').addEventListener('click', () => {
-            const amount = Number(currentInput);
-            if (!amount || amount <= 0) {
-                alert("Summani kiriting!");
-                return;
-            }
-            document.getElementById('debtAmountLabel').textContent = "Summa: " + formatSum(amount);
-            document.getElementById('debtModal').classList.add('active');
-        });
-
-        // NASIYA SAQLANGANDA (QARZ SAYTI BILAN 100% MOS STRUKTURA)
-        document.getElementById('btnConfirmDebt').addEventListener('click', async () => {
-            const rawName = document.getElementById('debtCustomerName').value.trim();
-            const note = document.getElementById('debtNote').value.trim();
-            if (!rawName) {
-                alert("Mijoz ismini kiriting!");
-                return;
-            }
-
-            const name = rawName.toLowerCase();
-            const amount = Number(currentInput);
-            const now = new Date();
-            const timeStr = now.toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'});
-            const dateStr = now.toISOString();
-            const formattedDate = now.toLocaleString('uz-UZ');
-
-            // 1. Kassa hisobotiga yozamiz
-            saveTx({
-                type: 'nasiya',
-                amount: amount,
-                customer: rawName,
-                note: note,
-                staff: currentShift.staff,
-                time: timeStr,
-                date: dateStr
-            });
-
-            // 2. QARZ NAZORATI SAYTIGA TUSHISHI (old_debtors / trusted_debtors)
-            try {
-                if (selectedCustomerData) {
-                    // Mavjud mijoz bo'lsa: uning amount'iga qo'shish
-                    const targetRef = doc(db, selectedCustomerData.coll, selectedCustomerData.id);
-                    const newAmount = (selectedCustomerData.amount || 0) + amount;
-                    
-                    await updateDoc(targetRef, {
-                        amount: newAmount,
-                        date: formattedDate,
-                        timestamp: Date.now()
-                    });
-                } else {
-                    // Yangi mijoz bo'lsa: old_debtors ga aynan Qarz saytingiz kutgan formatda qo'shish
-                    await addDoc(collection(db, "old_debtors"), {
-                        name: name,
-                        phone: "",
-                        amount: amount,
-                        timestamp: Date.now(),
-                        date: formattedDate
-                    });
-                }
-            } catch (err) {
-                console.error("Qarz bazasiga yozishda xato:", err);
-            }
-
-            document.getElementById('debtCustomerName').value = "";
-            document.getElementById('debtNote').value = "";
-            selectedCustomerData = null;
-            suggestBox.style.display = 'none';
-            closeModals();
-            currentInput = "";
-            updateDisplay();
-        });
-
-        // Chiqim (Kassadan va Qarz sayti cash_flow siga tushadi)
         document.getElementById('btnPayExpense').addEventListener('click', () => {
             const amount = Number(currentInput);
             if (!amount || amount <= 0) {
@@ -846,24 +1248,12 @@
                 date: now.toISOString()
             });
 
-            // Qarz saytidagi cash_flow kolleksiyasiga ham yozib qo'yamiz
-            try {
-                await addDoc(collection(db, "cash_flow"), {
-                    type: "Rasxod",
-                    reason: reason,
-                    amount: amount,
-                    timestamp: Date.now(),
-                    date: now.toLocaleString('uz-UZ')
-                });
-            } catch(e) {}
-
             document.getElementById('expenseReason').value = "";
             closeModals();
             currentInput = "";
             updateDisplay();
         });
 
-        // Kassa saqlash
         async function saveTx(data) {
             let updatedTotals = { ...shiftTotals };
             if (data.type === 'naqd') updatedTotals.cash += data.amount;
@@ -929,11 +1319,6 @@
 
             const box = currentShift.startCash + shiftTotals.cash - shiftTotals.expense;
             document.getElementById('statCashInBox').textContent = formatSum(box);
-        }
-
-        function closeModals() {
-            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
-            suggestBox.style.display = 'none';
         }
     </script>
 </body>
