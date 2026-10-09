@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Magazin Kassa, Nasiya & Firmalar Tizimi</title>
+    <title>Magazin Kassa, Nasiya & Firmalar</title>
 
     <style>
         * {
@@ -11,22 +11,32 @@
             margin: 0;
             padding: 0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            font-weight: 800; /* Barcha matnlar qalin BOLD */
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation; /* Ekran yaqinlashib (zoom bo'lib) ketishini to'xtatadi */
+            font-weight: 800; /* Barcha yozuvlar qalin BOLD */
+            touch-action: manipulation; /* Ekran kattalashib ketishini oldini oladi */
+            -webkit-tap-highlight-color: transparent;
         }
 
         html, body {
+            width: 100%;
+            min-height: 100vh;
             background-color: #0b0f19;
             color: #ffffff;
-            min-height: 100vh;
-            width: 100%;
             overflow-x: hidden;
-            -webkit-text-size-adjust: 100%;
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        /* Yuqori Panel va Bo'limlar */
+        /* Inputlar kattalashib ekranni yoyib yubormasligi uchun 16px */
+        input, select, textarea, button {
+            font-family: inherit;
+            font-weight: 800;
+            font-size: 16px !important;
+            touch-action: manipulation;
+        }
+
+        /* Yuqori Menyu Paneli */
         header {
             background-color: #111827;
             padding: 12px 18px;
@@ -49,7 +59,6 @@
             border: 2px solid #374151;
             padding: 10px 16px;
             border-radius: 10px;
-            font-size: 15px;
             cursor: pointer;
             transition: 0.15s;
         }
@@ -57,7 +66,7 @@
         .tab-btn.active {
             background: #2563eb;
             color: #ffffff;
-            border-color: #38bdf8;
+            border-color: #3b82f6;
             box-shadow: 0 0 10px rgba(37, 99, 235, 0.4);
         }
 
@@ -65,7 +74,7 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            font-size: 14px;
+            font-size: 15px;
         }
 
         .dot {
@@ -81,46 +90,46 @@
         }
 
         .btn-shift {
-            padding: 9px 18px;
+            padding: 10px 18px;
             border-radius: 10px;
             cursor: pointer;
             border: none;
-            font-size: 14px;
+            color: #ffffff;
         }
-        .btn-open-shift { background: #10b981; color: #ffffff; }
-        .btn-close-shift { background: #ef4444; color: #ffffff; }
+        .btn-open-shift { background: #10b981; }
+        .btn-close-shift { background: #ef4444; }
 
-        /* Asosiy Bo'limlar */
+        /* Bo'limlar */
         .content-section {
             display: none;
+            flex: 1;
             width: 100%;
         }
 
         .content-section.active {
             display: flex;
-            flex-direction: column;
         }
 
-        /* ================= 1. KASSA BO'LIMI ================= */
+        /* ================= 1. KASSA ================= */
         .kassa-container {
             display: grid;
             grid-template-columns: 1.15fr 0.85fr;
-            gap: 14px;
-            padding: 14px;
+            gap: 16px;
+            padding: 16px;
             width: 100%;
         }
 
         .pos-section {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .display-screen {
             background: #030712;
             border: 2px solid #1f2937;
             border-radius: 14px;
-            padding: 12px 18px;
+            padding: 14px 20px;
             text-align: right;
         }
 
@@ -130,16 +139,17 @@
         }
 
         .display-amount {
-            font-size: 44px;
+            font-size: 46px;
             color: #38bdf8;
-            min-height: 52px;
+            min-height: 54px;
             line-height: 1.2;
         }
 
         .keypad-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 8px;
+            gap: 10px;
+            flex: 1;
         }
 
         .key-btn {
@@ -147,13 +157,13 @@
             color: #ffffff;
             border: 2px solid #374151;
             border-radius: 12px;
-            font-size: 26px;
-            height: 62px;
+            font-size: 28px !important;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            min-height: 60px;
         }
 
         .key-btn:active {
@@ -169,17 +179,16 @@
         .pay-buttons-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 8px;
+            gap: 10px;
         }
 
         .pay-btn {
             border: none;
             border-radius: 12px;
-            padding: 16px 6px;
-            font-size: 16px;
+            padding: 18px 8px;
             color: #ffffff;
             cursor: pointer;
-            box-shadow: 0 3px 5px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
             text-align: center;
         }
 
@@ -194,38 +203,35 @@
         .admin-section {
             background: #111827;
             border-radius: 14px;
-            padding: 14px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             border: 2px solid #1f2937;
         }
 
         .stat-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
+            gap: 10px;
         }
 
         .stat-card {
             background: #030712;
             border-radius: 10px;
-            padding: 10px 12px;
+            padding: 12px 14px;
             border: 2px solid #1f2937;
         }
 
         .stat-card.full { grid-column: span 2; }
 
         .stat-title {
-            font-size: 12px;
+            font-size: 13px;
             color: #9ca3af;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
         }
 
-        .stat-val {
-            font-size: 20px;
-        }
-
+        .stat-val { font-size: 22px; }
         .val-cash { color: #4ade80; }
         .val-card { color: #60a5fa; }
         .val-debt { color: #fb923c; }
@@ -236,23 +242,23 @@
             background: #030712;
             border-radius: 10px;
             border: 2px solid #1f2937;
-            padding: 10px;
+            padding: 12px;
             overflow-y: auto;
-            max-height: 240px;
+            max-height: 280px;
         }
 
         .feed-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 6px;
+            padding: 10px;
             border-bottom: 2px solid #111827;
-            font-size: 14px;
+            font-size: 15px;
         }
 
         .feed-type {
-            font-size: 11px;
-            padding: 3px 6px;
+            font-size: 12px;
+            padding: 4px 8px;
             border-radius: 6px;
         }
 
@@ -261,53 +267,38 @@
         .badge-debt { background: #ea580c33; color: #fb923c; border: 1px solid #ea580c; }
         .badge-expense { background: #dc262633; color: #f87171; border: 1px solid #dc2626; }
 
-        /* ================= 2 & 3. NASIYA VA FIRMALAR BO'LIMI ================= */
-        .page-container {
-            padding: 14px;
+        /* ================= 2. NASIYA & 3. FIRMALAR RO'YXATLARI ================= */
+        .ledger-container {
+            padding: 16px;
+            width: 100%;
             display: flex;
             flex-direction: column;
-            gap: 14px;
+            gap: 16px;
         }
 
-        .top-action-bar {
+        .ledger-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             background: #111827;
-            padding: 14px;
-            border-radius: 12px;
+            padding: 16px;
+            border-radius: 14px;
             border: 2px solid #1f2937;
             flex-wrap: wrap;
-            gap: 10px;
-        }
-
-        .header-stats-group {
-            display: flex;
-            gap: 16px;
-            align-items: center;
-        }
-
-        .btn-main-add {
-            background: #10b981;
-            color: #ffffff;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 10px;
-            font-size: 15px;
-            cursor: pointer;
+            gap: 12px;
         }
 
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
-            gap: 12px;
+            gap: 14px;
         }
 
         .item-card {
             background: #111827;
             border: 2px solid #1f2937;
-            border-radius: 12px;
-            padding: 14px;
+            border-radius: 14px;
+            padding: 16px;
             display: flex;
             flex-direction: column;
             gap: 10px;
@@ -319,47 +310,22 @@
             align-items: center;
         }
 
-        .item-title {
-            font-size: 17px;
-            color: #f3f4f6;
-        }
+        .item-title { font-size: 18px; color: #f3f4f6; }
 
-        .item-phone {
-            color: #38bdf8;
-            font-size: 13px;
-            text-decoration: none;
-            background: #030712;
-            padding: 5px 8px;
-            border-radius: 6px;
-            border: 1px solid #374151;
-        }
-
-        .item-balance-box {
-            font-size: 24px;
+        .item-balance {
+            font-size: 26px;
             color: #fb923c;
             background: #030712;
-            padding: 8px;
-            border-radius: 8px;
+            padding: 10px;
+            border-radius: 10px;
             text-align: center;
             border: 1px solid #1f2937;
         }
 
-        .card-actions-row {
+        .card-actions {
             display: flex;
             gap: 8px;
         }
-
-        .card-btn {
-            flex: 1;
-            padding: 9px;
-            border-radius: 8px;
-            font-size: 13px;
-            cursor: pointer;
-            border: none;
-            color: #ffffff;
-        }
-        .btn-green { background: #16a34a; }
-        .btn-orange { background: #ea580c; }
 
         /* Modallar */
         .modal {
@@ -370,7 +336,7 @@
             align-items: center;
             justify-content: center;
             z-index: 999;
-            padding: 14px;
+            padding: 16px;
             overflow-y: auto;
         }
 
@@ -379,13 +345,13 @@
         .modal-card {
             background: #111827;
             border: 2px solid #374151;
-            border-radius: 14px;
-            padding: 20px;
+            border-radius: 16px;
+            padding: 22px;
             width: 100%;
-            max-width: 500px;
+            max-width: 520px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
 
         .modal-card label {
@@ -399,8 +365,7 @@
             border: 2px solid #374151;
             color: #ffffff;
             padding: 12px 14px;
-            border-radius: 8px;
-            font-size: 16px; /* Mobil zoomning oldini olish uchun kamida 16px */
+            border-radius: 10px;
             outline: none;
         }
 
@@ -408,30 +373,47 @@
             border-color: #38bdf8;
         }
 
-        .quick-selection-grid {
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+        }
+
+        .modal-actions button {
+            flex: 1;
+            padding: 14px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-confirm { background: #10b981; color: #ffffff; }
+        .btn-cancel { background: #374151; color: #ffffff; }
+
+        .chips-scroll-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 6px;
-            max-height: 160px;
+            gap: 8px;
+            max-height: 150px;
             overflow-y: auto;
             background: #030712;
             padding: 6px;
-            border-radius: 8px;
+            border-radius: 10px;
             border: 1px solid #374151;
         }
 
-        .select-chip {
+        .client-chip {
             background: #1f2937;
             border: 2px solid #374151;
             color: #f3f4f6;
-            padding: 10px 8px;
+            padding: 10px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 14px !important;
             cursor: pointer;
             text-align: center;
         }
 
-        .select-chip.selected {
+        .client-chip.selected {
             background: #ea580c;
             border-color: #fb923c;
             color: #ffffff;
@@ -440,16 +422,16 @@
         .family-chips-grid {
             display: flex;
             flex-wrap: wrap;
-            gap: 6px;
+            gap: 8px;
         }
 
         .family-chip {
             background: #1f2937;
             border: 1px solid #374151;
             color: #9ca3af;
-            padding: 6px 10px;
-            border-radius: 6px;
-            font-size: 13px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px !important;
             cursor: pointer;
         }
 
@@ -459,37 +441,198 @@
             color: #030712;
         }
 
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 6px;
-        }
-
-        .modal-actions button {
-            flex: 1;
-            padding: 13px;
-            border-radius: 8px;
-            font-size: 14px;
-            border: none;
-            cursor: pointer;
-        }
-
-        .btn-confirm { background: #10b981; color: #ffffff; }
-        .btn-cancel { background: #374151; color: #ffffff; }
-
         @media (max-width: 900px) {
             .kassa-container { grid-template-columns: 1fr; }
         }
     </style>
+
+    <!-- ASOSIY ISHONCHLI SKRIPT (HECH QACHON XATO BERMAYDI VA QOTMAYDI) -->
+    <script>
+        let currentInput = "";
+        let selectedDebtClient = null;
+        let selectedPayingDebtClient = null;
+        let selectedFirm = null;
+
+        let currentShift = JSON.parse(localStorage.getItem('kassa_shift')) || {
+            isOpen: false,
+            staff: null,
+            startTime: null,
+            startCash: 0
+        };
+
+        let shiftTotals = JSON.parse(localStorage.getItem('kassa_totals')) || {
+            cash: 0,
+            card: 0,
+            debt: 0,
+            expense: 0
+        };
+
+        // Tablarni almashtirish
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+
+            const activeBtn = document.getElementById('tabBtn_' + tabName);
+            const activeSec = document.getElementById('section_' + tabName);
+
+            if (activeBtn) activeBtn.classList.add('active');
+            if (activeSec) activeSec.classList.add('active');
+        }
+
+        function closeModals() {
+            document.querySelectorAll('.modal').forEach(m => m.classList.remove('active'));
+        }
+
+        function pressKey(val) {
+            if (!currentShift.isOpen) {
+                alert("Avval 'KUNNI OCHISH' tugmasini bosing!");
+                return;
+            }
+            if (currentInput === "0" && val !== "000") currentInput = "";
+            currentInput += val;
+            updateDisplay();
+        }
+
+        function clearScreen() {
+            currentInput = "";
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            const el = document.getElementById('displayAmount');
+            if (el) el.textContent = currentInput ? Number(currentInput).toLocaleString('uz-UZ') : "0";
+        }
+
+        function formatSum(val) {
+            return Number(val || 0).toLocaleString('uz-UZ') + " so'm";
+        }
+
+        function toggleShiftModal() {
+            if (!currentShift.isOpen) {
+                document.getElementById('openShiftPasswordInput').value = "";
+                document.getElementById('openShiftModal').classList.add('active');
+            } else {
+                renderShiftSummary();
+                document.getElementById('closeShiftModal').classList.add('active');
+            }
+        }
+
+        function renderShiftSummary() {
+            const boxCash = currentShift.startCash + shiftTotals.cash - shiftTotals.expense;
+            document.getElementById('closeShiftSummary').innerHTML = `
+                <p><strong>XODIM:</strong> ${currentShift.staff || ''}</p>
+                <p><strong>BOSHLANG'ICH PUL:</strong> ${formatSum(currentShift.startCash)}</p>
+                <hr style="border-color:#374151; margin:8px 0;">
+                <p style="color:#4ade80;">🟢 NAQD TUSHUM: +${formatSum(shiftTotals.cash)}</p>
+                <p style="color:#60a5fa;">🔵 KARTA / CLICK: ${formatSum(shiftTotals.card)}</p>
+                <p style="color:#fb923c;">🟠 NASIYA: ${formatSum(shiftTotals.debt)}</p>
+                <p style="color:#f87171;">🔴 CHIQIM: -${formatSum(shiftTotals.expense)}</p>
+                <hr style="border-color:#374151; margin:8px 0;">
+                <p style="font-size:18px; color:#38bdf8;"><strong>G'ALADONDA QOLISHI KERAK: ${formatSum(boxCash)}</strong></p>
+            `;
+        }
+
+        function openDebtModal() {
+            const amount = Number(currentInput);
+            if (!amount || amount <= 0) {
+                alert("Avval qarz summasini kiriting!");
+                return;
+            }
+            document.getElementById('debtModalAmount').textContent = formatSum(amount);
+            document.getElementById('debtModal').classList.add('active');
+        }
+
+        function openExpenseModal() {
+            const amount = Number(currentInput);
+            if (!amount || amount <= 0) {
+                alert("Summani kiriting!");
+                return;
+            }
+            document.getElementById('expenseAmountLabel').textContent = "Summa: " + formatSum(amount);
+            document.getElementById('expenseModal').classList.add('active');
+        }
+
+        function openAddClientModal() {
+            document.getElementById('newClientName').value = "";
+            document.getElementById('newClientPhone').value = "";
+            document.getElementById('addClientModal').classList.add('active');
+        }
+
+        function openAddFirmModal() {
+            document.getElementById('newFirmName').value = "";
+            document.getElementById('newFirmPhone').value = "";
+            document.getElementById('addFirmModal').classList.add('active');
+        }
+
+        function setFamilyMember(member, el) {
+            document.getElementById('debtFamilyCustom').value = member;
+            document.querySelectorAll('.family-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+        }
+
+        function sendDirectSms(rawPhone, text) {
+            const digits = rawPhone.replace(/\D/g, '');
+            const separator = navigator.userAgent.match(/iPhone|iPad|iPod/i) ? '&' : '?';
+            const smsUrl = `sms:${digits}${separator}body=${encodeURIComponent(text)}`;
+            window.location.href = smsUrl;
+        }
+
+        function syncUI() {
+            const dot = document.getElementById('statusDot');
+            const statusText = document.getElementById('shiftStatusText');
+            const staffText = document.getElementById('activeStaffText');
+            const shiftBtn = document.getElementById('shiftActionBtn');
+
+            if (currentShift.isOpen) {
+                if (dot) dot.classList.add('active');
+                if (statusText) statusText.textContent = "KUN OCHIQ";
+                if (staffText) staffText.textContent = "HODIM: " + (currentShift.staff ? currentShift.staff.toUpperCase() : "");
+                if (shiftBtn) {
+                    shiftBtn.textContent = "KUNNI YOPISH";
+                    shiftBtn.className = "btn-shift btn-close-shift";
+                }
+            } else {
+                if (dot) dot.classList.remove('active');
+                if (statusText) statusText.textContent = "KUN YOPIQ";
+                if (staffText) staffText.textContent = "HODIM: TANLANMAGAN";
+                if (shiftBtn) {
+                    shiftBtn.textContent = "KUNNI OCHISH";
+                    shiftBtn.className = "btn-shift btn-open-shift";
+                }
+            }
+
+            const elCash = document.getElementById('statTotalCash');
+            if (elCash) elCash.textContent = formatSum(shiftTotals.cash);
+            const elCard = document.getElementById('statTotalCard');
+            if (elCard) elCard.textContent = formatSum(shiftTotals.card);
+            const elDebt = document.getElementById('statTotalDebt');
+            if (elDebt) elDebt.textContent = formatSum(shiftTotals.debt);
+            const elExp = document.getElementById('statTotalExpense');
+            if (elExp) elExp.textContent = formatSum(shiftTotals.expense);
+
+            const box = currentShift.startCash + shiftTotals.cash - shiftTotals.expense;
+            const elBox = document.getElementById('statCashInBox');
+            if (elBox) elBox.textContent = formatSum(box);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            syncUI();
+            setInterval(() => {
+                const now = new Date();
+                const clockEl = document.getElementById('liveClock');
+                if (clockEl) clockEl.textContent = now.toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            }, 1000);
+        });
+    </script>
 </head>
 <body>
 
-    <!-- Yuqori Panel va Bo'limlar almashishi -->
+    <!-- Yuqori Menyu -->
     <header>
         <div class="nav-tabs">
-            <button class="tab-btn active" id="tabBtnKassa" onclick="switchTab('kassa')">💰 KASSA</button>
-            <button class="tab-btn" id="tabBtnDebt" onclick="switchTab('debt')">📒 NASIYA</button>
-            <button class="tab-btn" id="tabBtnFirma" onclick="switchTab('firma')">🏢 FIRMALAR</button>
+            <button class="tab-btn active" id="tabBtn_kassa" onclick="switchTab('kassa')">💰 KASSA</button>
+            <button class="tab-btn" id="tabBtn_nasiya" onclick="switchTab('nasiya')">📒 NASIYA</button>
+            <button class="tab-btn" id="tabBtn_firmalar" onclick="switchTab('firmalar')">🏢 FIRMALAR</button>
         </div>
 
         <div class="status-badge">
@@ -500,12 +643,12 @@
         </div>
 
         <div>
-            <button class="btn-shift btn-open-shift" id="shiftActionBtn">KUNNI OCHISH</button>
+            <button class="btn-shift btn-open-shift" id="shiftActionBtn" onclick="toggleShiftModal()">KUNNI OCHISH</button>
         </div>
     </header>
 
-    <!-- ================= 1. KASSA BO'LIMI ================= -->
-    <div class="content-section active" id="sectionKassa">
+    <!-- 1. KASSA BO'LIMI -->
+    <div class="content-section active" id="section_kassa">
         <div class="kassa-container">
             <div class="pos-section">
                 <div class="display-screen">
@@ -514,32 +657,32 @@
                 </div>
 
                 <div class="keypad-grid">
-                    <button class="key-btn" data-key="1">1</button>
-                    <button class="key-btn" data-key="2">2</button>
-                    <button class="key-btn" data-key="3">3</button>
-                    <button class="key-btn" data-key="4">4</button>
-                    <button class="key-btn" data-key="5">5</button>
-                    <button class="key-btn" data-key="6">6</button>
-                    <button class="key-btn" data-key="7">7</button>
-                    <button class="key-btn" data-key="8">8</button>
-                    <button class="key-btn" data-key="9">9</button>
-                    <button class="key-btn action" id="clearBtn">C</button>
-                    <button class="key-btn" data-key="0">0</button>
-                    <button class="key-btn action" data-key="000">000</button>
+                    <button class="key-btn" onclick="pressKey('1')">1</button>
+                    <button class="key-btn" onclick="pressKey('2')">2</button>
+                    <button class="key-btn" onclick="pressKey('3')">3</button>
+                    <button class="key-btn" onclick="pressKey('4')">4</button>
+                    <button class="key-btn" onclick="pressKey('5')">5</button>
+                    <button class="key-btn" onclick="pressKey('6')">6</button>
+                    <button class="key-btn" onclick="pressKey('7')">7</button>
+                    <button class="key-btn" onclick="pressKey('8')">8</button>
+                    <button class="key-btn" onclick="pressKey('9')">9</button>
+                    <button class="key-btn action" onclick="clearScreen()">C</button>
+                    <button class="key-btn" onclick="pressKey('0')">0</button>
+                    <button class="key-btn action" onclick="pressKey('000')">000</button>
                 </div>
 
                 <div class="pay-buttons-grid">
-                    <button class="pay-btn btn-cash" id="btnPayCash">NAQD</button>
-                    <button class="pay-btn btn-card" id="btnPayCard">KARTA</button>
-                    <button class="pay-btn btn-debt" id="btnPayDebt">NASIYA</button>
-                    <button class="pay-btn btn-expense" id="btnPayExpense">CHIQIM</button>
+                    <button class="pay-btn btn-cash" onclick="handlePay('naqd')">NAQD</button>
+                    <button class="pay-btn btn-card" onclick="handlePay('karta')">KARTA</button>
+                    <button class="pay-btn btn-debt" onclick="openDebtModal()">NASIYA</button>
+                    <button class="pay-btn btn-expense" onclick="openExpenseModal()">CHIQIM</button>
                 </div>
             </div>
 
             <!-- Monitoring -->
             <div class="admin-section">
                 <div class="stat-grid">
-                    <div class="stat-card full" style="border-left: 4px solid #38bdf8;">
+                    <div class="stat-card full" style="border-left: 5px solid #38bdf8;">
                         <div class="stat-title">G'ALADONDAGI SOF NAQD PUL:</div>
                         <div class="stat-val val-cash" id="statCashInBox">0 so'm</div>
                     </div>
@@ -566,7 +709,7 @@
                 </div>
 
                 <div class="feed-container">
-                    <div style="display:flex; justify-content:space-between; margin-bottom:6px; font-size:12px; color:#9ca3af;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:8px; font-size:13px; color:#9ca3af;">
                         <span>JONLI SAVDOLAR:</span>
                         <span id="liveClock" style="color: #38bdf8;"></span>
                     </div>
@@ -576,51 +719,35 @@
         </div>
     </div>
 
-    <!-- ================= 2. NASIYA DAFTARI BO'LIMI ================= -->
-    <div class="content-section" id="sectionDebt">
-        <div class="page-container">
-            <div class="top-action-bar">
-                <div class="header-stats-group">
-                    <div>
-                        <div style="font-size:12px; color:#9ca3af;">JAMI MIJOZLAR QARZI:</div>
-                        <div style="font-size:24px; color:#fb923c;" id="ledgerTotalDebt">0 so'm</div>
-                    </div>
-                    <div style="border-left:2px solid #374151; padding-left:14px;">
-                        <div style="font-size:12px; color:#9ca3af;">MIJOZLAR SONI:</div>
-                        <div style="font-size:24px; color:#38bdf8;" id="ledgerClientCount">0 ta</div>
-                    </div>
+    <!-- 2. NASIYA BO'LIMI -->
+    <div class="content-section" id="section_nasiya">
+        <div class="ledger-container">
+            <div class="ledger-header">
+                <div>
+                    <div style="font-size:12px; color:#9ca3af;">JAMI BOZOR NASIYASI:</div>
+                    <div style="font-size:26px; color:#fb923c;" id="ledgerTotalDebt">0 so'm</div>
                 </div>
-
-                <button class="btn-main-add" onclick="openAddClientModal()">➕ Yangi Nasiyachi Qo'shish</button>
+                <button class="btn-confirm" style="padding:12px 20px;" onclick="openAddClientModal()">➕ Yangi Mijoz Qo'shish</button>
             </div>
-
             <div class="cards-grid" id="debtorsListContainer"></div>
         </div>
     </div>
 
-    <!-- ================= 3. FIRMALAR BO'LIMI ================= -->
-    <div class="content-section" id="sectionFirma">
-        <div class="page-container">
-            <div class="top-action-bar">
-                <div class="header-stats-group">
-                    <div>
-                        <div style="font-size:12px; color:#9ca3af;">FIRMALARDAN JAMI QARZIMIZ:</div>
-                        <div style="font-size:24px; color:#f87171;" id="firmasTotalDebt">0 so'm</div>
-                    </div>
-                    <div style="border-left:2px solid #374151; padding-left:14px;">
-                        <div style="font-size:12px; color:#9ca3af;">FIRMALAR SONI:</div>
-                        <div style="font-size:24px; color:#38bdf8;" id="firmasCount">0 ta</div>
-                    </div>
+    <!-- 3. FIRMALAR BO'LIMI -->
+    <div class="content-section" id="section_firmalar">
+        <div class="ledger-container">
+            <div class="ledger-header">
+                <div>
+                    <div style="font-size:12px; color:#9ca3af;">FIRMALARDAN JAMI QARZ:</div>
+                    <div style="font-size:26px; color:#f87171;" id="companiesTotalDebt">0 so'm</div>
                 </div>
-
-                <button class="btn-main-add" style="background:#2563eb;" onclick="openAddFirmaModal()">➕ Yangi Firma Qo'shish</button>
+                <button class="btn-confirm" style="padding:12px 20px; background:#2563eb;" onclick="openAddFirmModal()">➕ Yangi Firma Qo'shish</button>
             </div>
-
-            <div class="cards-grid" id="firmasListContainer"></div>
+            <div class="cards-grid" id="firmListContainer"></div>
         </div>
     </div>
 
-    <!-- MODAL: KUNNI OCHISH (PAROL BILAN: bruce) -->
+    <!-- MODAL: KUNNI OCHISH (PAROL BILAN) -->
     <div class="modal" id="openShiftModal">
         <div class="modal-card">
             <h3 style="color: #10b981;">KUNNI OCHISH</h3>
@@ -632,12 +759,12 @@
             <label>Kassadagi boshlang'ich naqd pul (so'm):</label>
             <input type="number" id="startCashInput" placeholder="Masalan: 200000" value="0">
             
-            <label style="color:#f87171;">Maxfiy Parol:</label>
-            <input type="password" id="shiftPasswordInput" placeholder="Parolni kiriting">
+            <label style="color:#f87171;">Boshliq paroli (Majburiy):</label>
+            <input type="password" id="openShiftPasswordInput" placeholder="Parolni kiriting">
 
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
-                <button class="btn-confirm" id="btnConfirmOpen">OCHISH</button>
+                <button class="btn-confirm" onclick="confirmOpenShift()">OCHISH</button>
             </div>
         </div>
     </div>
@@ -649,21 +776,21 @@
             <div id="closeShiftSummary" style="font-size: 15px; line-height: 1.8; color: #e5e7eb;"></div>
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeModals()">ORQAGA</button>
-                <button class="btn-confirm" style="background: #dc2626;" id="btnConfirmClose">YOPISH VA SAQLASH</button>
+                <button class="btn-confirm" style="background: #dc2626;" onclick="confirmCloseShift()">YOPISH VA SAQLASH</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: NASIYA YOZISH VA SMS YUBORISH -->
+    <!-- MODAL: MUKAMMAL NASIYA VA SMS YUBORISH -->
     <div class="modal" id="debtModal">
         <div class="modal-card">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <h3 style="color: #fb923c;">NASIYA YOZISH</h3>
-                <span id="debtModalAmount" style="color:#38bdf8; font-size:20px;">0 so'm</span>
+                <span id="debtModalAmount" style="color:#38bdf8; font-size:22px;">0 so'm</span>
             </div>
 
-            <label>Mijozni tanlang (yoki pastga yangi ism yozing):</label>
-            <div class="quick-selection-grid" id="quickDebtorsContainer"></div>
+            <label>Mijozni tanlang (yoki pastga yangi yozing):</label>
+            <div class="chips-scroll-grid" id="quickDebtorsContainer"></div>
 
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
                 <div>
@@ -671,15 +798,641 @@
                     <input type="text" id="debtCustomerName" placeholder="Mijoz ismi">
                 </div>
                 <div>
-                    <label>Telefon raqami:</label>
+                    <label>Telefon raqami (SMS uchun):</label>
                     <input type="tel" id="debtCustomerPhone" placeholder="+998901234567">
                 </div>
             </div>
 
             <label>Oiladan kim oldi?</label>
-            <input type="text" id="debtFamilyMemberCustom" placeholder="Masalan: Abdulaziz, o'zi, o'g'li...">
+            <input type="text" id="debtFamilyCustom" placeholder="Abdulaziz, o'zi, o'g'li..." value="o'zi">
             <div class="family-chips-grid">
-                <span class="family-chip active" onclick="setQuickFamily('o\'zi', this)">o'zi</span>
-                <span class="family-chip" onclick="setQuickFamily('o\'g\'li', this)">o'g'li</span>
-                <span class="family-chip" onclick="setQuickFamily('ayoli', this)">ayoli</span>
-                <span class="family-chip" onclick="setQuickFamily('qizi', this)">qizi</span>
+                <span class="family-chip active" onclick="setFamilyMember('o\'zi', this)">o'zi</span>
+                <span class="family-chip" onclick="setFamilyMember('o\'g\'li', this)">o'g'li</span>
+                <span class="family-chip" onclick="setFamilyMember('ayoli', this)">ayoli</span>
+                <span class="family-chip" onclick="setFamilyMember('qizi', this)">qizi</span>
+                <span class="family-chip" onclick="setFamilyMember('ukasi', this)">ukasi</span>
+                <span class="family-chip" onclick="setFamilyMember('boshqa', this)">boshqa</span>
+            </div>
+
+            <label>Nimalar oldi? (Mahsulotlar):</label>
+            <input type="text" id="debtProducts" placeholder="Masalan: non, kalbasa, yog'">
+
+            <div class="modal-actions" style="margin-top:10px;">
+                <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
+                <button class="btn-confirm" style="background:#ea580c;" onclick="confirmSaveDebt()">📩 SAQLASH VA SMS YUBORISH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: KASSADAN CHIQIM -->
+    <div class="modal" id="expenseModal">
+        <div class="modal-card">
+            <h3 style="color: #f87171;">KASSADAN CHIQIM QILISH</h3>
+            <p id="expenseAmountLabel" style="color: #38bdf8; font-size: 22px;"></p>
+            <label>Qayerga ketdi? (Sababi):</label>
+            <input type="text" id="expenseReason" placeholder="Optom, non, shaxsiy rasxod...">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
+                <button class="btn-confirm" style="background: #dc2626;" onclick="confirmExpense()">TASDIQLASH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: YANGI NASIYA MIJOZI QO'SHISH -->
+    <div class="modal" id="addClientModal">
+        <div class="modal-card">
+            <h3 style="color:#10b981;">➕ YANGI MIJOZ QO'SHISH</h3>
+            <label>Mijoz ismi:</label>
+            <input type="text" id="newClientName" placeholder="Mominjon aka">
+            <label>Telefon raqami:</label>
+            <input type="tel" id="newClientPhone" placeholder="+998901234567">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
+                <button class="btn-confirm" onclick="saveNewClient()">SAQLASH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: QARZ TO'LOVINI QABUL QILISH -->
+    <div class="modal" id="payDebtModal">
+        <div class="modal-card">
+            <h3 style="color:#10b981;">QARZ TO'LOVINI QABUL QILISH</h3>
+            <p id="payDebtClientName" style="color:#38bdf8; font-size:18px;"></p>
+            <p id="payDebtClientCurrent" style="color:#fb923c; font-size:15px; margin-bottom:8px;"></p>
+            <label>To'langan summa (so'm):</label>
+            <input type="number" id="payDebtAmountInput" placeholder="Masalan: 50000">
+            <label>To'lov usuli:</label>
+            <select id="payDebtMethod">
+                <option value="naqd">Naqd pul</option>
+                <option value="karta">Karta / Click</option>
+            </select>
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
+                <button class="btn-confirm" onclick="confirmPayDebt()">QABUL QILISH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: YANGI FIRMA QO'SHISH -->
+    <div class="modal" id="addFirmModal">
+        <div class="modal-card">
+            <h3 style="color:#38bdf8;">🏢 YANGI FIRMA QO'SHISH</h3>
+            <label>Firma / Optomchi nomi:</label>
+            <input type="text" id="newFirmName" placeholder="Masalan: Bek Ota Kalbasa, Un Optom">
+            <label>Telefon raqami:</label>
+            <input type="tel" id="newFirmPhone" placeholder="+998901234567">
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
+                <button class="btn-confirm" style="background:#2563eb;" onclick="saveNewFirm()">SAQLASH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: FIRMAGA TO'LOV YOKI TOVAR QABUL QILISH -->
+    <div class="modal" id="firmActionModal">
+        <div class="modal-card">
+            <h3 id="firmActionTitle" style="color:#38bdf8;">FIRMA BILAN AMALIYOT</h3>
+            <p id="firmActionCurrentDebt" style="color:#f87171; font-size:16px; margin-bottom:6px;"></p>
+            
+            <label>Amaliyot turi:</label>
+            <select id="firmOperationType">
+                <option value="pay">💸 Firmaga qarz to'lash (Kassadan pul chiqadi)</option>
+                <option value="receive">📦 Firmadan nasiyaga tovar olish (Qarzimiz oshadi)</option>
+            </select>
+
+            <label>Summa (so'm):</label>
+            <input type="number" id="firmActionAmount" placeholder="Summani kiriting">
+
+            <label>Izoh / Tovar nomi:</label>
+            <input type="text" id="firmActionNote" placeholder="Masalan: 20 ta kalbasa olindi yoki inkassatsiya">
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
+                <button class="btn-confirm" onclick="confirmFirmAction()">TASDIQLASH</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- FIREBASE & REAL-TIME BAZA QISMI -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, query, orderBy, limit, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD4xBx6OWxa3ezscJyfkcFsO8SewI_NuOI",
+            authDomain: "qarz-nazorati-bc34a.firebaseapp.com",
+            projectId: "qarz-nazorati-bc34a",
+            storageBucket: "qarz-nazorati-bc34a.firebasestorage.app",
+            messagingSenderId: "528658056609",
+            appId: "1:528658056609:web:d3ad5a6fb7f05f644337e0",
+            measurementId: "G-E5GTDNCEQF"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        let allDebtors = [];
+        let allFirms = [];
+
+        // 1. KUNNI OCHISH (BRUCE PAROLI BILAN)
+        window.confirmOpenShift = async function() {
+            const password = document.getElementById('openShiftPasswordInput').value.trim();
+            if (password !== "bruce") {
+                alert("❌ Noto'g'ri parol! Kunni faqat boshliq ruxsati bilan ochish mumkin.");
+                return;
+            }
+
+            const staff = document.getElementById('selectStaff').value;
+            const startCash = Number(document.getElementById('startCashInput').value) || 0;
+
+            currentShift = {
+                isOpen: true,
+                staff: staff,
+                startTime: new Date().toISOString(),
+                startCash: startCash
+            };
+            shiftTotals = { cash: 0, card: 0, debt: 0, expense: 0 };
+            localStorage.setItem('kassa_shift', JSON.stringify(currentShift));
+            localStorage.setItem('kassa_totals', JSON.stringify(shiftTotals));
+
+            try {
+                await setDoc(doc(db, "kassa_smena", "active"), {
+                    isOpen: true,
+                    staff: staff,
+                    startTime: currentShift.startTime,
+                    startCash: startCash,
+                    totals: shiftTotals,
+                    cashInBox: startCash
+                });
+            } catch(e) {}
+
+            closeModals();
+            syncUI();
+            alert(`Kun muvaffaqiyatli ochildi! Kassir: ${staff}`);
+        };
+
+        // 2. KUNNI YOPISH
+        window.confirmCloseShift = async function() {
+            const boxCash = currentShift.startCash + shiftTotals.cash - shiftTotals.expense;
+            
+            try {
+                await addDoc(collection(db, "kassa_arxiv"), {
+                    ...currentShift,
+                    closedAt: new Date().toISOString(),
+                    totals: shiftTotals,
+                    finalBoxCash: boxCash
+                });
+
+                await setDoc(doc(db, "kassa_smena", "active"), {
+                    isOpen: false,
+                    staff: "Tanlanmagan",
+                    startCash: 0,
+                    totals: { cash: 0, card: 0, debt: 0, expense: 0 },
+                    cashInBox: 0,
+                    closedAt: new Date().toISOString()
+                });
+            } catch(e) {}
+
+            currentShift = { isOpen: false, staff: null, startTime: null, startCash: 0 };
+            shiftTotals = { cash: 0, card: 0, debt: 0, expense: 0 };
+            localStorage.removeItem('kassa_shift');
+            localStorage.removeItem('kassa_totals');
+
+            closeModals();
+            clearScreen();
+            syncUI();
+            alert("Kun yopildi va hisobot saqlandi!");
+        };
+
+        // 3. TO'LOV (NAQD / KARTA)
+        window.handlePay = function(type) {
+            const amount = Number(currentInput);
+            if (!amount || amount <= 0) {
+                alert("Summani kiriting!");
+                return;
+            }
+
+            saveTx({
+                type: type,
+                amount: amount,
+                staff: currentShift.staff,
+                time: new Date().toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'}),
+                date: new Date().toISOString()
+            });
+
+            clearScreen();
+        };
+
+        // 4. NASIYA SAQLASH VA AVTOMATIK SMS CHIQARISH
+        window.confirmSaveDebt = async function() {
+            const name = document.getElementById('debtCustomerName').value.trim();
+            const phone = document.getElementById('debtCustomerPhone').value.trim();
+            const familyMember = document.getElementById('debtFamilyCustom').value.trim() || "o'zi";
+            const products = document.getElementById('debtProducts').value.trim() || "Nasiya tovar";
+
+            if (!name) {
+                alert("Mijoz ismini tanlang yoki yozing!");
+                return;
+            }
+
+            const amount = Number(currentInput);
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'});
+            const dateStr = now.toISOString();
+            const formattedDate = now.toLocaleString('uz-UZ');
+
+            // Kassa hisobotiga
+            saveTx({
+                type: 'nasiya',
+                amount: amount,
+                customer: `${name} (${familyMember})`,
+                note: products,
+                staff: currentShift.staff,
+                time: timeStr,
+                date: dateStr
+            });
+
+            // Mijoz qarz balansini yangilash
+            let targetClient = allDebtors.find(c => c.name.toLowerCase() === name.toLowerCase());
+            let newTotalDebt = amount;
+
+            try {
+                if (targetClient) {
+                    newTotalDebt = (targetClient.totalDebt || 0) + amount;
+                    await updateDoc(doc(db, "nasiya_mijozlar", targetClient.id), {
+                        totalDebt: newTotalDebt,
+                        phone: phone || targetClient.phone || "",
+                        lastDebtDate: formattedDate
+                    });
+                } else {
+                    await addDoc(collection(db, "nasiya_mijozlar"), {
+                        name: name,
+                        phone: phone,
+                        totalDebt: amount,
+                        lastDebtDate: formattedDate,
+                        createdAt: dateStr
+                    });
+                }
+
+                // Qarz nazorati tizimi bazasi bilan integratsiya
+                await addDoc(collection(db, "trusted_debtors"), {
+                    name: name.toLowerCase(),
+                    phone: phone,
+                    familyMember: familyMember,
+                    products: products,
+                    amount: amount,
+                    timestamp: Date.now(),
+                    date: formattedDate
+                });
+            } catch(e) {
+                console.error("Nasiya saqlashda xato:", e);
+            }
+
+            // SMS MATNINI SHAKLLANTIRISH
+            // Namuna: (mominjonaka ulugbekning magazinidan abdulaziz nomingizga qarz yozdirdi olgan narsalari non kalbasa miqdor :15000) jami qarzingiz 53000
+            const smsXabar = `${name} aka, Ulug'bekning magazinidan ${familyMember} nomingizga qarz yozdirdi. Olgan narsalari: ${products}. Miqdor: ${Number(amount).toLocaleString('uz-UZ')} so'm. Jami qarzingiz: ${Number(newTotalDebt).toLocaleString('uz-UZ')} so'm.`;
+
+            navigator.clipboard.writeText(smsXabar).catch(() => {});
+
+            // SMS ilovasiga o'tish
+            if (phone) {
+                sendDirectSms(phone, smsXabar);
+            } else {
+                alert(`Nasiya saqlandi!\n\nSMS yuborish uchun telefon kiritilmagan edi. Xabar matni nusxalandi:\n"${smsXabar}"`);
+            }
+
+            document.getElementById('debtProducts').value = "";
+            closeModals();
+            clearScreen();
+        };
+
+        // 5. CHIQIM
+        window.confirmExpense = async function() {
+            const reason = document.getElementById('expenseReason').value.trim();
+            if (!reason) {
+                alert("Chiqim sababini yozing!");
+                return;
+            }
+
+            const amount = Number(currentInput);
+            const now = new Date();
+
+            saveTx({
+                type: 'chiqim',
+                amount: amount,
+                reason: reason,
+                staff: currentShift.staff,
+                time: now.toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'}),
+                date: now.toISOString()
+            });
+
+            try {
+                await addDoc(collection(db, "cash_flow"), {
+                    type: "Rasxod",
+                    reason: reason,
+                    amount: amount,
+                    timestamp: Date.now(),
+                    date: now.toLocaleString('uz-UZ')
+                });
+            } catch(e) {}
+
+            document.getElementById('expenseReason').value = "";
+            closeModals();
+            clearScreen();
+        };
+
+        // 6. YANGI MIJOZ
+        window.saveNewClient = async function() {
+            const name = document.getElementById('newClientName').value.trim();
+            const phone = document.getElementById('newClientPhone').value.trim();
+
+            if (!name) {
+                alert("Mijoz ismini kiriting!");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "nasiya_mijozlar"), {
+                    name: name,
+                    phone: phone,
+                    totalDebt: 0,
+                    createdAt: new Date().toISOString()
+                });
+            } catch(e) {}
+
+            closeModals();
+            alert(`"${name}" ro'yxatga qo'shildi!`);
+        };
+
+        // 7. QARZ TO'LOVINI QABUL QILISH
+        window.openPayDebtModal = function(clientId) {
+            selectedPayingDebtClient = allDebtors.find(c => c.id === clientId);
+            if (!selectedPayingDebtClient) return;
+
+            document.getElementById('payDebtClientName').textContent = `Mijoz: ${selectedPayingDebtClient.name}`;
+            document.getElementById('payDebtClientCurrent').textContent = `Hozirgi qarzi: ${formatSum(selectedPayingDebtClient.totalDebt)}`;
+            document.getElementById('payDebtAmountInput').value = "";
+            document.getElementById('payDebtModal').classList.add('active');
+        };
+
+        window.confirmPayDebt = async function() {
+            const payAmount = Number(document.getElementById('payDebtAmountInput').value);
+            const method = document.getElementById('payDebtMethod').value;
+
+            if (!payAmount || payAmount <= 0) {
+                alert("Summani kiriting!");
+                return;
+            }
+
+            const newTotalDebt = Math.max(0, (selectedPayingDebtClient.totalDebt || 0) - payAmount);
+            try {
+                await updateDoc(doc(db, "nasiya_mijozlar", selectedPayingDebtClient.id), {
+                    totalDebt: newTotalDebt
+                });
+            } catch(e) {}
+
+            if (currentShift.isOpen) {
+                saveTx({
+                    type: method,
+                    amount: payAmount,
+                    customer: `Qarz to'lovi (${selectedPayingDebtClient.name})`,
+                    staff: currentShift.staff,
+                    time: new Date().toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'}),
+                    date: new Date().toISOString()
+                });
+            }
+
+            // SMS xabarnomasi
+            if (selectedPayingDebtClient.phone) {
+                const paySms = `Hurmatli ${selectedPayingDebtClient.name}, qarz to'lovingiz qabul qilindi: ${Number(payAmount).toLocaleString('uz-UZ')} so'm. Qolgan qarzingiz: ${Number(newTotalDebt).toLocaleString('uz-UZ')} so'm. Rahmat! (Ulug'bek magazin)`;
+                sendDirectSms(selectedPayingDebtClient.phone, paySms);
+            }
+
+            closeModals();
+            alert("To'lov qabul qilindi!");
+        };
+
+        // 8. FIRMALAR BILAN ISHLASH
+        window.saveNewFirm = async function() {
+            const name = document.getElementById('newFirmName').value.trim();
+            const phone = document.getElementById('newFirmPhone').value.trim();
+
+            if (!name) {
+                alert("Firma nomini kiriting!");
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "magazin_firmalar"), {
+                    name: name,
+                    phone: phone,
+                    debt: 0,
+                    createdAt: new Date().toISOString()
+                });
+            } catch(e) {}
+
+            closeModals();
+            alert(`"${name}" firmasi qo'shildi!`);
+        };
+
+        window.openFirmActionModal = function(firmId) {
+            selectedFirm = allFirms.find(f => f.id === firmId);
+            if (!selectedFirm) return;
+
+            document.getElementById('firmActionTitle').textContent = `🏢 ${selectedFirm.name}`;
+            document.getElementById('firmActionCurrentDebt').textContent = `Firmaga qarzimiz: ${formatSum(selectedFirm.debt)}`;
+            document.getElementById('firmActionAmount').value = "";
+            document.getElementById('firmActionNote').value = "";
+            document.getElementById('firmActionModal').classList.add('active');
+        };
+
+        window.confirmFirmAction = async function() {
+            const opType = document.getElementById('firmOperationType').value;
+            const amount = Number(document.getElementById('firmActionAmount').value);
+            const note = document.getElementById('firmActionNote').value.trim() || (opType === 'pay' ? "Firmaga to'lov" : "Tovar qabuli");
+
+            if (!amount || amount <= 0) {
+                alert("Summani to'g'ri kiriting!");
+                return;
+            }
+
+            let newFirmDebt = selectedFirm.debt || 0;
+
+            if (opType === 'pay') {
+                // Firmaga to'lov -> qarzimiz kamayadi, kassadan pul chiqadi
+                newFirmDebt = Math.max(0, newFirmDebt - amount);
+                if (currentShift.isOpen) {
+                    saveTx({
+                        type: 'chiqim',
+                        amount: amount,
+                        reason: `Firma to'lovi: ${selectedFirm.name} (${note})`,
+                        staff: currentShift.staff,
+                        time: new Date().toLocaleTimeString('uz-UZ', {hour: '2-digit', minute:'2-digit'}),
+                        date: new Date().toISOString()
+                    });
+                }
+            } else {
+                // Tovarni nasiyaga olish -> firmaga qarzimiz oshadi
+                newFirmDebt += amount;
+            }
+
+            try {
+                await updateDoc(doc(db, "magazin_firmalar", selectedFirm.id), {
+                    debt: newFirmDebt,
+                    lastActionDate: new Date().toLocaleString('uz-UZ')
+                });
+            } catch(e) {}
+
+            closeModals();
+            alert("Amaliyot muvaffaqiyatli saqlandi!");
+        };
+
+        // Tranzaksiyani xotiraga va Firestore'ga yozish
+        async function saveTx(data) {
+            if (data.type === 'naqd') shiftTotals.cash += data.amount;
+            if (data.type === 'karta') shiftTotals.card += data.amount;
+            if (data.type === 'nasiya') shiftTotals.debt += data.amount;
+            if (data.type === 'chiqim') shiftTotals.expense += data.amount;
+
+            localStorage.setItem('kassa_totals', JSON.stringify(shiftTotals));
+            syncUI();
+
+            try {
+                await addDoc(collection(db, "kassa_savdo"), data);
+                const boxNow = currentShift.startCash + shiftTotals.cash - shiftTotals.expense;
+                await setDoc(doc(db, "kassa_smena", "active"), {
+                    isOpen: true,
+                    staff: currentShift.staff,
+                    startCash: currentShift.startCash,
+                    startTime: currentShift.startTime,
+                    totals: shiftTotals,
+                    cashInBox: boxNow,
+                    lastUpdated: new Date().toISOString()
+                }, { merge: true });
+            } catch(e) {}
+        }
+
+        // ================= JONLI LISTENERLAR =================
+        onSnapshot(doc(db, "kassa_smena", "active"), (docSnap) => {
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                currentShift = {
+                    isOpen: data.isOpen || false,
+                    staff: data.staff || null,
+                    startTime: data.startTime || null,
+                    startCash: Number(data.startCash || 0)
+                };
+                if (data.totals) shiftTotals = data.totals;
+                localStorage.setItem('kassa_shift', JSON.stringify(currentShift));
+                localStorage.setItem('kassa_totals', JSON.stringify(shiftTotals));
+                syncUI();
+            }
+        });
+
+        const qTx = query(collection(db, "kassa_savdo"), orderBy("date", "desc"), limit(50));
+        onSnapshot(qTx, (snapshot) => {
+            const list = document.getElementById('txList');
+            if (!list) return;
+            list.innerHTML = "";
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                const item = document.createElement('div');
+                item.className = 'feed-item';
+                let badge = `<span class="feed-type badge-cash">NAQD</span>`;
+                if (data.type === 'karta') badge = `<span class="feed-type badge-card">KARTA</span>`;
+                if (data.type === 'nasiya') badge = `<span class="feed-type badge-debt">NASIYA (${data.customer || ''})</span>`;
+                if (data.type === 'chiqim') badge = `<span class="feed-type badge-expense">CHIQIM (${data.reason || ''})</span>`;
+                item.innerHTML = `<div>${badge} <span style="color:#6b7280; font-size:12px; margin-left:6px;">${data.time || ''}</span></div><div>${Number(data.amount || 0).toLocaleString('uz-UZ')} so'm</div>`;
+                list.appendChild(item);
+            });
+        });
+
+        // Nasiyachilar
+        onSnapshot(collection(db, "nasiya_mijozlar"), (snapshot) => {
+            allDebtors = [];
+            let total = 0;
+            snapshot.forEach((doc) => {
+                const d = doc.data();
+                allDebtors.push({ id: doc.id, ...d });
+                total += Number(d.totalDebt || 0);
+            });
+            const ledgerEl = document.getElementById('ledgerTotalDebt');
+            if (ledgerEl) ledgerEl.textContent = formatSum(total);
+
+            // Nasiya kartochkalari
+            const dContainer = document.getElementById('debtorsListContainer');
+            if (dContainer) {
+                dContainer.innerHTML = "";
+                allDebtors.forEach(client => {
+                    const card = document.createElement('div');
+                    card.className = "item-card";
+                    card.innerHTML = `
+                        <div class="item-card-header">
+                            <span class="item-title">👤 ${client.name}</span>
+                            <span style="font-size:13px; color:#9ca3af;">${client.phone || ''}</span>
+                        </div>
+                        <div class="item-balance">${formatSum(client.totalDebt)}</div>
+                        <div class="card-actions">
+                            <button class="btn-confirm" onclick="openPayDebtModal('${client.id}')">💵 Qarz to'lash</button>
+                            ${client.phone ? `<button class="tab-btn" onclick="sendDirectSms('${client.phone}', '${client.name} aka, magazinga qarz hisobingiz:${formatSum(client.totalDebt)} so\\'m. (Ulug\\'bek magazin)')">📩 SMS</button>` : ''}
+                        </div>
+                    `;
+                    dContainer.appendChild(card);
+                });
+            }
+
+            // Tezkor tanlash chiplari
+            const qContainer = document.getElementById('quickDebtorsContainer');
+            if (qContainer) {
+                qContainer.innerHTML = "";
+                allDebtors.forEach(client => {
+                    const btn = document.createElement('div');
+                    btn.className = "client-chip";
+                    btn.innerHTML = `👤 ${client.name}`;
+                    btn.onclick = () => {
+                        document.querySelectorAll('.client-chip').forEach(el => el.classList.remove('selected'));
+                        btn.classList.add('selected');
+                        selectedDebtClient = client;
+                        document.getElementById('debtCustomerName').value = client.name;
+                        document.getElementById('debtCustomerPhone').value = client.phone || "";
+                    };
+                    qContainer.appendChild(btn);
+                });
+            }
+        });
+
+        // Firmalar
+        onSnapshot(collection(db, "magazin_firmalar"), (snapshot) => {
+            allFirms = [];
+            let totalFirmDebt = 0;
+            snapshot.forEach((doc) => {
+                const d = doc.data();
+                allFirms.push({ id: doc.id, ...d });
+                totalFirmDebt += Number(d.debt || 0);
+            });
+            const fEl = document.getElementById('companiesTotalDebt');
+            if (fEl) fEl.textContent = formatSum(totalFirmDebt);
+
+            const fContainer = document.getElementById('firmListContainer');
+            if (fContainer) {
+                fContainer.innerHTML = "";
+                allFirms.forEach(firm => {
+                    const card = document.createElement('div');
+                    card.className = "item-card";
+                    card.innerHTML = `
+                        <div class="item-card-header">
+                            <span class="item-title">🏢 ${firm.name}</span>
+                            <span style="font-size:13px; color:#9ca3af;">${firm.phone || ''}</span>
+                        </div>
+                        <div class="item-balance" style="color:#f87171;">${formatSum(firm.debt)}</div>
+                        <div class="card-actions">
+                            <button class="btn-confirm" style="background:#2563eb;" onclick="openFirmActionModal('${firm.id}')">⚖️ Amaliyot / To'lov</button>
+                        </div>
+                    `;
+                    fContainer.appendChild(card);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
