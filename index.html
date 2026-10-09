@@ -12,7 +12,7 @@
             padding: 0;
             font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             font-weight: 800; /* Barcha yozuvlar qalin BOLD */
-            touch-action: manipulation; /* Ekran kattalashib ketishini oldini oladi */
+            touch-action: manipulation; /* Ekran kattalashib yoyilishini to'xtatadi */
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -28,11 +28,10 @@
             -webkit-user-select: none;
         }
 
-        /* Inputlar kattalashib ekranni yoyib yubormasligi uchun 16px */
         input, select, textarea, button {
             font-family: inherit;
             font-weight: 800;
-            font-size: 16px !important;
+            font-size: 16px !important; /* Mobil brauzerlarda avto-zoomni to'xtatadi */
             touch-action: manipulation;
         }
 
@@ -59,6 +58,7 @@
             border: 2px solid #374151;
             padding: 10px 16px;
             border-radius: 10px;
+            font-size: 15px !important;
             cursor: pointer;
             transition: 0.15s;
         }
@@ -110,7 +110,7 @@
             display: flex;
         }
 
-        /* ================= 1. KASSA ================= */
+        /* 1. KASSA */
         .kassa-container {
             display: grid;
             grid-template-columns: 1.15fr 0.85fr;
@@ -267,7 +267,7 @@
         .badge-debt { background: #ea580c33; color: #fb923c; border: 1px solid #ea580c; }
         .badge-expense { background: #dc262633; color: #f87171; border: 1px solid #dc2626; }
 
-        /* ================= 2. NASIYA & 3. FIRMALAR RO'YXATLARI ================= */
+        /* 2. NASIYA VA 3. FIRMALAR */
         .ledger-container {
             padding: 16px;
             width: 100%;
@@ -290,7 +290,7 @@
 
         .cards-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
             gap: 14px;
         }
 
@@ -325,6 +325,22 @@
         .card-actions {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .card-actions button {
+            flex: 1;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 14px !important;
+        }
+
+        .btn-delete-item {
+            background: #dc2626 !important;
+            border: none;
+            color: #ffffff;
+            flex: 0.35 !important;
+            cursor: pointer;
         }
 
         /* Modallar */
@@ -446,7 +462,7 @@
         }
     </style>
 
-    <!-- ASOSIY ISHONCHLI SKRIPT (HECH QACHON XATO BERMAYDI VA QOTMAYDI) -->
+    <!-- ASOSIY ISHONCHLI SKRIPT -->
     <script>
         let currentInput = "";
         let selectedDebtClient = null;
@@ -467,7 +483,6 @@
             expense: 0
         };
 
-        // Tablarni almashtirish
         function switchTab(tabName) {
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
@@ -561,6 +576,7 @@
         function openAddFirmModal() {
             document.getElementById('newFirmName').value = "";
             document.getElementById('newFirmPhone').value = "";
+            document.getElementById('newFirmDebt').value = "0";
             document.getElementById('addFirmModal').classList.add('active');
         }
 
@@ -873,7 +889,7 @@
         </div>
     </div>
 
-    <!-- MODAL: YANGI FIRMA QO'SHISH -->
+    <!-- MODAL: YANGI FIRMA QO'SHISH (BOSHLANG'ICH QARZ BILAN) -->
     <div class="modal" id="addFirmModal">
         <div class="modal-card">
             <h3 style="color:#38bdf8;">🏢 YANGI FIRMA QO'SHISH</h3>
@@ -881,6 +897,8 @@
             <input type="text" id="newFirmName" placeholder="Masalan: Bek Ota Kalbasa, Un Optom">
             <label>Telefon raqami:</label>
             <input type="tel" id="newFirmPhone" placeholder="+998901234567">
+            <label>Boshlang'ich qarz summasi (agar bo'lsa):</label>
+            <input type="number" id="newFirmDebt" placeholder="Masalan: 500000" value="0">
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
                 <button class="btn-confirm" style="background:#2563eb;" onclick="saveNewFirm()">SAQLASH</button>
@@ -888,7 +906,7 @@
         </div>
     </div>
 
-    <!-- MODAL: FIRMAGA TO'LOV YOKI TOVAR QABUL QILISH -->
+    <!-- MODAL: FIRMA BILAN AMALIYOTLAR -->
     <div class="modal" id="firmActionModal">
         <div class="modal-card">
             <h3 id="firmActionTitle" style="color:#38bdf8;">FIRMA BILAN AMALIYOT</h3>
@@ -904,7 +922,7 @@
             <input type="number" id="firmActionAmount" placeholder="Summani kiriting">
 
             <label>Izoh / Tovar nomi:</label>
-            <input type="text" id="firmActionNote" placeholder="Masalan: 20 ta kalbasa olindi yoki inkassatsiya">
+            <input type="text" id="firmActionNote" placeholder="Masalan: 20 ta kalbasa olindi yoki to'lov">
 
             <div class="modal-actions">
                 <button class="btn-cancel" onclick="closeModals()">BEKOR QILISH</button>
@@ -916,7 +934,7 @@
     <!-- FIREBASE & REAL-TIME BAZA QISMI -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, query, orderBy, limit, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, setDoc, query, orderBy, limit, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyD4xBx6OWxa3ezscJyfkcFsO8SewI_NuOI",
@@ -934,7 +952,7 @@
         let allDebtors = [];
         let allFirms = [];
 
-        // 1. KUNNI OCHISH (BRUCE PAROLI BILAN)
+        // 1. KUNNI OCHISH (BRUCE PAROLI)
         window.confirmOpenShift = async function() {
             const password = document.getElementById('openShiftPasswordInput').value.trim();
             if (password !== "bruce") {
@@ -968,7 +986,7 @@
 
             closeModals();
             syncUI();
-            alert(`Kun muvaffaqiyatli ochildi! Kassir: ${staff}`);
+            alert(`Kun ochildi! Kassir: ${staff}`);
         };
 
         // 2. KUNNI YOPISH
@@ -1023,7 +1041,7 @@
             clearScreen();
         };
 
-        // 4. NASIYA SAQLASH VA AVTOMATIK SMS CHIQARISH
+        // 4. NASIYA SAQLASH VA SMS
         window.confirmSaveDebt = async function() {
             const name = document.getElementById('debtCustomerName').value.trim();
             const phone = document.getElementById('debtCustomerPhone').value.trim();
@@ -1041,7 +1059,6 @@
             const dateStr = now.toISOString();
             const formattedDate = now.toLocaleString('uz-UZ');
 
-            // Kassa hisobotiga
             saveTx({
                 type: 'nasiya',
                 amount: amount,
@@ -1052,7 +1069,6 @@
                 date: dateStr
             });
 
-            // Mijoz qarz balansini yangilash
             let targetClient = allDebtors.find(c => c.name.toLowerCase() === name.toLowerCase());
             let newTotalDebt = amount;
 
@@ -1074,7 +1090,6 @@
                     });
                 }
 
-                // Qarz nazorati tizimi bazasi bilan integratsiya
                 await addDoc(collection(db, "trusted_debtors"), {
                     name: name.toLowerCase(),
                     phone: phone,
@@ -1088,13 +1103,10 @@
                 console.error("Nasiya saqlashda xato:", e);
             }
 
-            // SMS MATNINI SHAKLLANTIRISH
-            // Namuna: (mominjonaka ulugbekning magazinidan abdulaziz nomingizga qarz yozdirdi olgan narsalari non kalbasa miqdor :15000) jami qarzingiz 53000
             const smsXabar = `${name} aka, Ulug'bekning magazinidan ${familyMember} nomingizga qarz yozdirdi. Olgan narsalari: ${products}. Miqdor: ${Number(amount).toLocaleString('uz-UZ')} so'm. Jami qarzingiz: ${Number(newTotalDebt).toLocaleString('uz-UZ')} so'm.`;
 
             navigator.clipboard.writeText(smsXabar).catch(() => {});
 
-            // SMS ilovasiga o'tish
             if (phone) {
                 sendDirectSms(phone, smsXabar);
             } else {
@@ -1106,7 +1118,31 @@
             clearScreen();
         };
 
-        // 5. CHIQIM
+        // 5. NASIYACHINI BITTADA O'CHIRISH
+        window.deleteDebtor = async function(clientId, clientName) {
+            if (confirm(`Haqiqatan ham "${clientName}" mijozini va uning barcha qarzini butunlay o'chirmoqchimisiz?`)) {
+                try {
+                    await deleteDoc(doc(db, "nasiya_mijozlar", clientId));
+                    alert(`"${clientName}" ro'yxatdan o'chirildi!`);
+                } catch(e) {
+                    alert("O'chirishda xatolik yuz berdi!");
+                }
+            }
+        };
+
+        // 6. FIRMANI O'CHIRISH
+        window.deleteFirm = async function(firmId, firmName) {
+            if (confirm(`Haqiqatan ham "${firmName}" firmasini o'chirmoqchimisiz?`)) {
+                try {
+                    await deleteDoc(doc(db, "magazin_firmalar", firmId));
+                    alert(`"${firmName}" o'chirildi!`);
+                } catch(e) {
+                    alert("O'chirishda xatolik yuz berdi!");
+                }
+            }
+        };
+
+        // 7. CHIQIM
         window.confirmExpense = async function() {
             const reason = document.getElementById('expenseReason').value.trim();
             if (!reason) {
@@ -1141,7 +1177,7 @@
             clearScreen();
         };
 
-        // 6. YANGI MIJOZ
+        // 8. YANGI NASIYA MIJOZI QO'SHISH
         window.saveNewClient = async function() {
             const name = document.getElementById('newClientName').value.trim();
             const phone = document.getElementById('newClientPhone').value.trim();
@@ -1164,7 +1200,7 @@
             alert(`"${name}" ro'yxatga qo'shildi!`);
         };
 
-        // 7. QARZ TO'LOVINI QABUL QILISH
+        // 9. QARZ TO'LOVINI QABUL QILISH
         window.openPayDebtModal = function(clientId) {
             selectedPayingDebtClient = allDebtors.find(c => c.id === clientId);
             if (!selectedPayingDebtClient) return;
@@ -1202,7 +1238,6 @@
                 });
             }
 
-            // SMS xabarnomasi
             if (selectedPayingDebtClient.phone) {
                 const paySms = `Hurmatli ${selectedPayingDebtClient.name}, qarz to'lovingiz qabul qilindi: ${Number(payAmount).toLocaleString('uz-UZ')} so'm. Qolgan qarzingiz: ${Number(newTotalDebt).toLocaleString('uz-UZ')} so'm. Rahmat! (Ulug'bek magazin)`;
                 sendDirectSms(selectedPayingDebtClient.phone, paySms);
@@ -1212,10 +1247,11 @@
             alert("To'lov qabul qilindi!");
         };
 
-        // 8. FIRMALAR BILAN ISHLASH
+        // 10. YANGI FIRMA QO'SHISH (BOSHLANG'ICH QARZ BILAN)
         window.saveNewFirm = async function() {
             const name = document.getElementById('newFirmName').value.trim();
             const phone = document.getElementById('newFirmPhone').value.trim();
+            const initialDebt = Number(document.getElementById('newFirmDebt').value) || 0;
 
             if (!name) {
                 alert("Firma nomini kiriting!");
@@ -1226,7 +1262,7 @@
                 await addDoc(collection(db, "magazin_firmalar"), {
                     name: name,
                     phone: phone,
-                    debt: 0,
+                    debt: initialDebt,
                     createdAt: new Date().toISOString()
                 });
             } catch(e) {}
@@ -1235,6 +1271,7 @@
             alert(`"${name}" firmasi qo'shildi!`);
         };
 
+        // 11. FIRMA BILAN AMALIYOTLAR
         window.openFirmActionModal = function(firmId) {
             selectedFirm = allFirms.find(f => f.id === firmId);
             if (!selectedFirm) return;
@@ -1259,7 +1296,6 @@
             let newFirmDebt = selectedFirm.debt || 0;
 
             if (opType === 'pay') {
-                // Firmaga to'lov -> qarzimiz kamayadi, kassadan pul chiqadi
                 newFirmDebt = Math.max(0, newFirmDebt - amount);
                 if (currentShift.isOpen) {
                     saveTx({
@@ -1272,7 +1308,6 @@
                     });
                 }
             } else {
-                // Tovarni nasiyaga olish -> firmaga qarzimiz oshadi
                 newFirmDebt += amount;
             }
 
@@ -1284,10 +1319,9 @@
             } catch(e) {}
 
             closeModals();
-            alert("Amaliyot muvaffaqiyatli saqlandi!");
+            alert("Amaliyot saqlandi!");
         };
 
-        // Tranzaksiyani xotiraga va Firestore'ga yozish
         async function saveTx(data) {
             if (data.type === 'naqd') shiftTotals.cash += data.amount;
             if (data.type === 'karta') shiftTotals.card += data.amount;
@@ -1312,7 +1346,7 @@
             } catch(e) {}
         }
 
-        // ================= JONLI LISTENERLAR =================
+        // ================= JONLI TINGLOVCHILAR =================
         onSnapshot(doc(db, "kassa_smena", "active"), (docSnap) => {
             if (docSnap.exists()) {
                 const data = docSnap.data();
@@ -1359,7 +1393,6 @@
             const ledgerEl = document.getElementById('ledgerTotalDebt');
             if (ledgerEl) ledgerEl.textContent = formatSum(total);
 
-            // Nasiya kartochkalari
             const dContainer = document.getElementById('debtorsListContainer');
             if (dContainer) {
                 dContainer.innerHTML = "";
@@ -1373,15 +1406,15 @@
                         </div>
                         <div class="item-balance">${formatSum(client.totalDebt)}</div>
                         <div class="card-actions">
-                            <button class="btn-confirm" onclick="openPayDebtModal('${client.id}')">💵 Qarz to'lash</button>
+                            <button class="btn-confirm" onclick="openPayDebtModal('${client.id}')">💵 To'lov</button>
                             ${client.phone ? `<button class="tab-btn" onclick="sendDirectSms('${client.phone}', '${client.name} aka, magazinga qarz hisobingiz:${formatSum(client.totalDebt)} so\\'m. (Ulug\\'bek magazin)')">📩 SMS</button>` : ''}
+                            <button class="btn-delete-item" onclick="deleteDebtor('${client.id}', '${client.name}')">🗑️</button>
                         </div>
                     `;
                     dContainer.appendChild(card);
                 });
             }
 
-            // Tezkor tanlash chiplari
             const qContainer = document.getElementById('quickDebtorsContainer');
             if (qContainer) {
                 qContainer.innerHTML = "";
@@ -1426,7 +1459,8 @@
                         </div>
                         <div class="item-balance" style="color:#f87171;">${formatSum(firm.debt)}</div>
                         <div class="card-actions">
-                            <button class="btn-confirm" style="background:#2563eb;" onclick="openFirmActionModal('${firm.id}')">⚖️ Amaliyot / To'lov</button>
+                            <button class="btn-confirm" style="background:#2563eb;" onclick="openFirmActionModal('${firm.id}')">⚖️ Amaliyot</button>
+                            <button class="btn-delete-item" onclick="deleteFirm('${firm.id}', '${firm.name}')">🗑️</button>
                         </div>
                     `;
                     fContainer.appendChild(card);
